@@ -1,52 +1,65 @@
 import { useTracker } from '../../hooks/useTracker';
+import { holidayMessages, holidayColors, holidaySleepingDecorations } from '../../config';
 
+/**
+ * Component shown when it's not the holiday day.
+ * Displays the sleeping/resting character with decorations.
+ */
 const SleepingBunny = () => {
-  const { nextEasterFormatted } = useTracker();
+  const { nextHolidayFormatted } = useTracker();
+
+  // Format the comeback message with the date
+  const comeBackMessage = holidayMessages.comeBackMessage.replace('{date}', nextHolidayFormatted);
 
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-easter-purple mb-3">
-          The Easter Bunny is Sleeping
+        <h2 className="text-2xl font-bold mb-3" style={{ color: holidayColors.light }}>
+          {holidayMessages.sleepingTitle}
         </h2>
-        <p className="text-gray-600 mb-4">
-          The Easter Bunny is resting until the next Easter Sunday!
-        </p>
-        <p className="text-lg font-medium text-easter-pink">
-          Come back on {nextEasterFormatted} to track the bunny's journey!
+        <p className="text-gray-600 mb-4">{holidayMessages.sleepingDescription}</p>
+        <p className="text-lg font-medium" style={{ color: holidayColors.primary }}>
+          {comeBackMessage}
         </p>
       </div>
-      
+
       <div className="w-full max-w-md relative">
-        <div className="bg-easter-blue/20 rounded-full w-64 h-64 mx-auto flex items-center justify-center">
+        <div
+          className="rounded-full w-64 h-64 mx-auto flex items-center justify-center"
+          style={{ backgroundColor: `${holidayColors.secondary}33` }} // 33 = 20% opacity
+        >
           <div className="relative">
-            {/* Sleeping bunny emoji with zzz animation */}
-            <span className="text-8xl">🐰</span>
+            {/* Character emoji with sleep animation */}
+            <span className="text-8xl">{holidaySleepingDecorations.characterEmoji}</span>
             <div className="absolute -top-4 -right-4 animate-bounce">
-              <span className="text-3xl">💤</span>
+              <span className="text-3xl">{holidaySleepingDecorations.sleepEmoji}</span>
             </div>
           </div>
         </div>
-        
-        {/* Easter eggs decoration */}
-        <div className="absolute bottom-0 left-0 transform -translate-x-1/4">
-          <span className="text-4xl">🥚</span>
-        </div>
-        <div className="absolute bottom-4 right-0 transform translate-x-1/4">
-          <span className="text-4xl">🥚</span>
-        </div>
-        <div className="absolute top-4 right-8">
-          <span className="text-3xl">🥕</span>
-        </div>
+
+        {/* Decoration emojis */}
+        {holidaySleepingDecorations.decorationEmojis[0] && (
+          <div className="absolute bottom-0 left-0 transform -translate-x-1/4">
+            <span className="text-4xl">{holidaySleepingDecorations.decorationEmojis[0]}</span>
+          </div>
+        )}
+        {holidaySleepingDecorations.decorationEmojis[1] && (
+          <div className="absolute bottom-4 right-0 transform translate-x-1/4">
+            <span className="text-4xl">{holidaySleepingDecorations.decorationEmojis[1]}</span>
+          </div>
+        )}
+        {holidaySleepingDecorations.accentEmoji && (
+          <div className="absolute top-4 right-8">
+            <span className="text-3xl">{holidaySleepingDecorations.accentEmoji}</span>
+          </div>
+        )}
       </div>
-      
+
       <div className="mt-8 bg-white p-4 rounded-lg shadow-md max-w-lg">
-        <h3 className="font-bold text-lg text-easter-green mb-2">Fun Fact</h3>
-        <p>
-          The Easter Bunny works very hard one day a year, delivering baskets
-          to children around the world! For the rest of the year, the bunny rests,
-          prepares Easter eggs, and practices hopping skills.
-        </p>
+        <h3 className="font-bold text-lg mb-2" style={{ color: holidayColors.highlight }}>
+          Fun Fact
+        </h3>
+        <p>{holidayMessages.sleepingFunFact}</p>
       </div>
     </div>
   );

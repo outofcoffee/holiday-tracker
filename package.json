@@ -1,16 +1,23 @@
 {
-  "name": "eastertracker",
+  "name": "holiday-tracker",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
+  "description": "A fun web application that tracks holiday characters (Easter Bunny or Santa) around the world on their special day",
   "engines": {
     "node": ">=22.0.0"
   },
   "scripts": {
     "dev": "vite",
+    "dev:easter": "VITE_HOLIDAY_MODE=easter vite",
+    "dev:christmas": "VITE_HOLIDAY_MODE=christmas vite",
     "build": "tsc && vite build",
+    "build:easter": "VITE_HOLIDAY_MODE=easter tsc && VITE_HOLIDAY_MODE=easter vite build",
+    "build:christmas": "VITE_HOLIDAY_MODE=christmas tsc && VITE_HOLIDAY_MODE=christmas vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "preview:easter": "VITE_HOLIDAY_MODE=easter vite preview",
+    "preview:christmas": "VITE_HOLIDAY_MODE=christmas vite preview",
     "test": "vitest --no-watch",
     "test:coverage": "vitest run --coverage"
   },

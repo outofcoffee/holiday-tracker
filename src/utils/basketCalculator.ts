@@ -1,14 +1,26 @@
+import { holidayPeoplePerItem, holidayItemsDeliveredName } from '../config';
+
 // Estimated world population for 2025
 const WORLD_POPULATION = 8_100_000_000;
 
-// One basket can serve multiple people in a household
-const PEOPLE_PER_BASKET = 4;
+/**
+ * Calculate how many items have been delivered based on completion percentage.
+ * The item type (baskets, presents, etc.) is determined by the holiday configuration.
+ */
+export const calculateItemsDelivered = (completionPercentage: number): number => {
+  const totalItems = Math.ceil(WORLD_POPULATION / holidayPeoplePerItem);
+  const deliveredItems = Math.floor(totalItems * (completionPercentage / 100));
+  return deliveredItems;
+};
 
-// Calculate how many baskets have been delivered based on completion percentage
-export const calculateBasketsDelivered = (completionPercentage: number): number => {
-  const totalBaskets = Math.ceil(WORLD_POPULATION / PEOPLE_PER_BASKET);
-  const deliveredBaskets = Math.floor(totalBaskets * (completionPercentage / 100));
-  return deliveredBaskets;
+// Legacy alias for backward compatibility (used in existing code)
+export const calculateBasketsDelivered = calculateItemsDelivered;
+
+/**
+ * Get the name of items being delivered (e.g., "Baskets" or "Presents")
+ */
+export const getItemsDeliveredName = (): string => {
+  return holidayItemsDeliveredName;
 };
 
 // Format large numbers with commas

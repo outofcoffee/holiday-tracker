@@ -1,8 +1,8 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { calculateCurrentPosition } from '../utils/geoUtils';
-import { calculateBasketsDelivered } from '../utils/basketCalculator';
+import { calculateItemsDelivered } from '../utils/basketCalculator';
 import { BunnyPosition, ViewerLocation, DEFAULT_MAP_ZOOM } from '../types';
-import { isEaster, getNextEasterDate, formatDate } from '../utils/timeUtils';
+import { isHolidayDay, getNextHolidayDate, formatDate } from '../utils/timeUtils';
 import { TrackerContext } from './TrackerContextDefinition';
 import { preloadLandmassData } from '../utils/landmassDetector';
 import logger from '../utils/logger';
@@ -14,79 +14,79 @@ interface TrackerProviderProps {
 export const TrackerProvider = ({ children }: TrackerProviderProps) => {
   const [currentPosition, setCurrentPosition] = useState<BunnyPosition | null>(null);
   const [totalCities, setTotalCities] = useState(0);
-  const [basketsDelivered, setBasketsDelivered] = useState(0);
+  const [itemsDelivered, setItemsDelivered] = useState(0);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [viewerLocation, setViewerLocation] = useState<ViewerLocation | null>(null);
   const [estimatedArrivalTime, setEstimatedArrivalTime] = useState<string | null>(null);
   const [isNearby, setIsNearby] = useState(false);
-  const [isEasterDay, setIsEasterDay] = useState(isEaster());
-  const [nextEasterDate, setNextEasterDate] = useState(getNextEasterDate());
-  const [nextEasterFormatted, setNextEasterFormatted] = useState(formatDate(getNextEasterDate()));
-  const [mapZoomLevel, setMapZoomLevel] = useState(DEFAULT_MAP_ZOOM); // Default zoom level
+  const [isHoliday, setIsHoliday] = useState(isHolidayDay());
+  const [nextHoliday, setNextHoliday] = useState(getNextHolidayDate());
+  const [nextHolidayFormatted, setNextHolidayFormatted] = useState(formatDate(getNextHolidayDate()));
+  const [mapZoomLevel, setMapZoomLevel] = useState(DEFAULT_MAP_ZOOM);
 
   // Preload the GeoJSON data at component mount
   useEffect(() => {
     const preloadData = async () => {
       try {
-        logger.debug("Preloading GeoJSON data...");
+        logger.debug('Preloading GeoJSON data...');
         await preloadLandmassData();
-        logger.debug("GeoJSON data loaded successfully");
+        logger.debug('GeoJSON data loaded successfully');
       } catch (error) {
-        logger.error("Failed to preload GeoJSON data:", error);
+        logger.error('Failed to preload GeoJSON data:', error);
       }
     };
 
     preloadData();
   }, []);
 
-  // Check if it's Easter Day and update relevant information
+  // Check if it's the holiday day and update relevant information
   useEffect(() => {
-    const checkEaster = () => {
-      // Update Easter status
-      const easterDay = isEaster();
-      setIsEasterDay(easterDay);
-      
-      // Update next Easter date if needed
-      const nextEaster = getNextEasterDate();
-      setNextEasterDate(nextEaster);
-      setNextEasterFormatted(formatDate(nextEaster));
+    const checkHoliday = () => {
+      // Update holiday status
+      const holidayDay = isHolidayDay();
+      setIsHoliday(holidayDay);
+
+      // Update next holiday date if needed
+      const nextHolidayDate = getNextHolidayDate();
+      setNextHoliday(nextHolidayDate);
+      setNextHolidayFormatted(formatDate(nextHolidayDate));
     };
-    
+
     // Check initially
-    checkEaster();
-    
+    checkHoliday();
+
     // Check periodically (every minute is enough for date changes)
-    const interval = setInterval(checkEaster, 60000);
+    const interval = setInterval(checkHoliday, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Update bunny position every second (only on Easter)
+  // Update character position every second (only on the holiday)
   useEffect(() => {
-    // If it's not Easter, don't track position
-    if (!isEasterDay) {
+    // If it's not the holiday, don't track position
+    if (!isHoliday) {
       setCurrentPosition(null);
       setCompletionPercentage(0);
-      setBasketsDelivered(0);
+      setItemsDelivered(0);
       return;
     }
-    
+
     const updatePosition = async () => {
       const position = await calculateCurrentPosition(mapZoomLevel);
-      
+
       if (position) {
         setCurrentPosition(position);
         setTotalCities(position.totalCities);
         setCompletionPercentage(position.completionPercentage);
-        
-        // Calculate baskets
-        const baskets = calculateBasketsDelivered(position.completionPercentage);
-        setBasketsDelivered(baskets);
-        
-        // Check if bunny is near viewer
+
+        // Calculate items delivered
+        const items = calculateItemsDelivered(position.completionPercentage);
+        setItemsDelivered(items);
+
+        // Check if character is near viewer
         if (viewerLocation) {
           const isNear = position.nearestCity?.name === viewerLocation.nearestCity?.name;
           setIsNearby(isNear);
-          
+
           if (!estimatedArrivalTime && viewerLocation.nearestCity) {
             // Calculate estimated arrival time based on journey
             const { calculateArrivalTime } = await import('../utils/geoUtils');
@@ -99,40 +99,37 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
 
     updatePosition();
     const interval = setInterval(updatePosition, 1000);
-    
-    return () => clearInterval(interval);
-  }, [viewerLocation, estimatedArrivalTime, isEasterDay, viewerLocation?.nearestCity, mapZoomLevel]);
 
-  // Get viewer's location ONCE at startup, but only during Easter period
+    return () => clearInterval(interval);
+  }, [viewerLocation, estimatedArrivalTime, isHoliday, viewerLocation?.nearestCity, mapZoomLevel]);
+
+  // Get viewer's location ONCE at startup, but only during holiday period
   useEffect(() => {
     // Only get location if:
     // 1. We don't already have it
     // 2. Geolocation is available
-    // 3. It's Easter day (do not request in development when not Easter)
-    const shouldRequestLocation = 
-      !viewerLocation && 
-      navigator.geolocation && 
-      isEasterDay;
-    
+    // 3. It's the holiday day (do not request in development when not the holiday)
+    const shouldRequestLocation = !viewerLocation && navigator.geolocation && isHoliday;
+
     if (shouldRequestLocation) {
-      logger.debug(`Getting user location once during Easter period (isEasterDay: ${isEasterDay})`);
-      
+      logger.debug(`Getting user location once during holiday period (isHolidayDay: ${isHoliday})`);
+
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
             const { latitude, longitude } = position.coords;
-            logger.debug("Got user location:", latitude, longitude);
-            
+            logger.debug('Got user location:', latitude, longitude);
+
             // Import getUserNearestCity directly to avoid circular imports
             const { getUserNearestCity } = await import('../utils/geoUtils');
             const nearestCity = await getUserNearestCity(latitude, longitude);
-            
+
             setViewerLocation({
               latitude,
               longitude,
-              nearestCity
+              nearestCity,
             });
-            
+
             // If we have the nearest city, set an estimated arrival time
             if (nearestCity) {
               const { calculateArrivalTime } = await import('../utils/geoUtils');
@@ -140,28 +137,30 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
               setEstimatedArrivalTime(arrivalTime);
             }
           } catch (error) {
-            logger.error("Error processing location:", error);
+            logger.error('Error processing location:', error);
           }
         },
         (error) => {
           logger.error('Error getting location:', error.message);
-          
+
           // Try once more after a delay (user might have dismissed the prompt)
           setTimeout(() => {
-            if (!viewerLocation && isEasterDay) {
-              logger.debug("Retrying geolocation once...");
+            if (!viewerLocation && isHoliday) {
+              logger.debug('Retrying geolocation once...');
               navigator.geolocation.getCurrentPosition(
                 async (position) => {
                   const { latitude, longitude } = position.coords;
-                  const { getUserNearestCity, calculateArrivalTime } = await import('../utils/geoUtils');
+                  const { getUserNearestCity, calculateArrivalTime } = await import(
+                    '../utils/geoUtils'
+                  );
                   const nearestCity = await getUserNearestCity(latitude, longitude);
-                  
+
                   setViewerLocation({
                     latitude,
                     longitude,
-                    nearestCity
+                    nearestCity,
                   });
-                  
+
                   if (nearestCity) {
                     const arrivalTime = await calculateArrivalTime(nearestCity);
                     setEstimatedArrivalTime(arrivalTime);
@@ -175,31 +174,40 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
             }
           }, 3000);
         },
-        { 
-          timeout: 10000, 
-          enableHighAccuracy: true, 
+        {
+          timeout: 10000,
+          enableHighAccuracy: true,
           // Cache position for 24 hours
-          maximumAge: 24 * 60 * 60 * 1000 
+          maximumAge: 24 * 60 * 60 * 1000,
         }
       );
     }
-  }, [viewerLocation, isEasterDay]);
+  }, [viewerLocation, isHoliday]);
 
   return (
-    <TrackerContext.Provider value={{
-      currentPosition,
-      totalCities,
-      basketsDelivered,
-      completionPercentage,
-      viewerLocation,
-      estimatedArrivalTime,
-      isNearby,
-      isEasterDay,
-      nextEasterDate,
-      nextEasterFormatted,
-      mapZoomLevel,
-      setMapZoomLevel
-    }}>
+    <TrackerContext.Provider
+      value={{
+        currentPosition,
+        totalCities,
+        // New property names
+        itemsDelivered,
+        isHolidayDay: isHoliday,
+        nextHolidayDate: nextHoliday,
+        nextHolidayFormatted,
+        // Legacy property names for backward compatibility
+        basketsDelivered: itemsDelivered,
+        isEasterDay: isHoliday,
+        nextEasterDate: nextHoliday,
+        nextEasterFormatted: nextHolidayFormatted,
+        // Other properties
+        completionPercentage,
+        viewerLocation,
+        estimatedArrivalTime,
+        isNearby,
+        mapZoomLevel,
+        setMapZoomLevel,
+      }}
+    >
       {children}
     </TrackerContext.Provider>
   );

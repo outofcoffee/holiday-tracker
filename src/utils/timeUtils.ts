@@ -1,14 +1,16 @@
 import logger from './logger';
+import { holidayDate, holidayName } from '../config';
 
 // Format time to display in a user-friendly way
 export const formatTime = (date: Date): string => {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-// Get the date of Easter for a given year
-export const getEasterDate = (year: number): Date => {
-  // Algorithm to calculate Easter Sunday for any year
-  // Based on Butcher's algorithm
+/**
+ * Calculate Easter date for a given year using Butcher's algorithm.
+ * This is used when the holiday date type is 'calculated' with algorithm 'easter'.
+ */
+const calculateEasterDate = (year: number): Date => {
   const a = year % 19;
   const b = Math.floor(year / 100);
   const c = year % 100;
@@ -23,7 +25,7 @@ export const getEasterDate = (year: number): Date => {
   const m = Math.floor((a + 11 * h + 22 * l) / 451);
   const month = Math.floor((h + l - 7 * m + 114) / 31);
   const day = ((h + l - 7 * m + 114) % 31) + 1;
-  
+
   // Create a date in UTC (avoiding Date.UTC for better compatibility)
   const easterDate = new Date();
   easterDate.setUTCFullYear(year, month - 1, day);
@@ -31,41 +33,84 @@ export const getEasterDate = (year: number): Date => {
   return easterDate;
 };
 
+/**
+ * Get the holiday date for a given year.
+ * Supports both fixed dates (like Christmas on Dec 25) and calculated dates (like Easter).
+ */
+export const getHolidayDate = (year: number): Date => {
+  if (holidayDate.type === 'fixed') {
+    // Fixed date (e.g., Christmas on December 25)
+    const fixedDate = new Date();
+    fixedDate.setUTCFullYear(year, (holidayDate.fixedMonth || 12) - 1, holidayDate.fixedDay || 25);
+    fixedDate.setUTCHours(0, 0, 0, 0);
+    return fixedDate;
+  } else if (holidayDate.type === 'calculated') {
+    // Calculated date based on algorithm
+    if (holidayDate.calculationAlgorithm === 'easter') {
+      return calculateEasterDate(year);
+    }
+    // Default to a fallback (shouldn't happen with proper config)
+    logger.warn(`Unknown calculation algorithm: ${holidayDate.calculationAlgorithm}`);
+    return calculateEasterDate(year);
+  }
+
+  // Fallback (shouldn't reach here)
+  logger.warn(`Unknown date type: ${holidayDate.type}`);
+  return calculateEasterDate(year);
+};
+
+// Legacy alias for backward compatibility
+export const getEasterDate = getHolidayDate;
+
 // Define timezone constants
 const EASTERNMOST_TIMEZONE = 14; // UTC+14 (Kiritimati/Christmas Island)
 const WESTERNMOST_TIMEZONE = -12; // UTC-12 (Baker Island)
 
-// Get when Easter begins globally (in easternmost timezone UTC+14)
-export const getGlobalEasterStart = (easterDate: Date): Date => {
+/**
+ * Get when the holiday begins globally (in easternmost timezone UTC+14).
+ * This is the start of the extended time window that covers the holiday
+ * in ALL timezones around the world.
+ */
+export const getGlobalHolidayStart = (holidayDateValue: Date): Date => {
   // Create a new date object to avoid modifying the original
-  const easterStart = new Date(easterDate);
-  
+  const holidayStart = new Date(holidayDateValue);
+
   // Set to midnight UTC
-  easterStart.setUTCHours(0, 0, 0, 0);
-  
+  holidayStart.setUTCHours(0, 0, 0, 0);
+
   // Adjust for easternmost timezone (UTC+14)
-  // Easter in UTC+14 starts 14 hours before UTC
-  // So we need to subtract 14 hours from Easter at UTC
-  easterStart.setUTCHours(easterStart.getUTCHours() - EASTERNMOST_TIMEZONE);
-  
-  return easterStart;
+  // Holiday in UTC+14 starts 14 hours before UTC
+  // So we need to subtract 14 hours from Holiday at UTC
+  holidayStart.setUTCHours(holidayStart.getUTCHours() - EASTERNMOST_TIMEZONE);
+
+  return holidayStart;
 };
 
-// Get when Easter ends globally (in westernmost timezone UTC-12)
-export const getGlobalEasterEnd = (easterDate: Date): Date => {
+// Legacy alias for backward compatibility
+export const getGlobalEasterStart = getGlobalHolidayStart;
+
+/**
+ * Get when the holiday ends globally (in westernmost timezone UTC-12).
+ * This is the end of the extended time window that covers the holiday
+ * in ALL timezones around the world.
+ */
+export const getGlobalHolidayEnd = (holidayDateValue: Date): Date => {
   // Create a new date object to avoid modifying the original
-  const easterEnd = new Date(easterDate);
-  
+  const holidayEnd = new Date(holidayDateValue);
+
   // Set to end of day UTC (23:59:59.999)
-  easterEnd.setUTCHours(23, 59, 59, 999);
-  
+  holidayEnd.setUTCHours(23, 59, 59, 999);
+
   // Adjust for westernmost timezone (UTC-12)
-  // Easter in UTC-12 ends 12 hours after UTC
-  // So we need to add 12 hours to Easter end at UTC
-  easterEnd.setUTCHours(easterEnd.getUTCHours() - WESTERNMOST_TIMEZONE);
-  
-  return easterEnd;
+  // Holiday in UTC-12 ends 12 hours after UTC
+  // So we need to add 12 hours to Holiday end at UTC
+  holidayEnd.setUTCHours(holidayEnd.getUTCHours() - WESTERNMOST_TIMEZONE);
+
+  return holidayEnd;
 };
+
+// Legacy alias for backward compatibility
+export const getGlobalEasterEnd = getGlobalHolidayEnd;
 
 // Get current time, possibly overridden for testing
 interface GetCurrentTimeFunction {
@@ -79,12 +124,12 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
   const func = (): Date => {
     // Check for testing overrides via query parameters first, then environment variables
     let mockTimeString, mockDateString;
-    
+
     // Check URL query parameters (using snake_case param names)
     const urlParams = new URLSearchParams(window.location.search);
     mockTimeString = urlParams.get('mock_time');
     mockDateString = urlParams.get('mock_date');
-    
+
     // If not found in query params, check environment variables
     if (!mockTimeString && !mockDateString) {
       try {
@@ -94,13 +139,13 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
         // No mock values available
       }
     }
-    
+
     // VITE_MOCK_TIME takes precedence over VITE_MOCK_DATE
     if (mockTimeString) {
       try {
         // Parse ISO format YYYY-MM-DDTHH:MM:SS
         const mockTime = new Date(mockTimeString);
-        
+
         // Validate that the date is valid
         if (!isNaN(mockTime.getTime())) {
           // Only log once when the app starts
@@ -123,16 +168,16 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
           getCurrentTime.hasLoggedError = true;
         }
       }
-    } 
+    }
     // If no VITE_MOCK_TIME but VITE_MOCK_DATE is specified
     else if (mockDateString) {
       try {
         // Get current time
         const now = new Date();
-        
+
         // Parse date format YYYY-MM-DD
         const mockDate = new Date(mockDateString);
-        
+
         // Validate that the date is valid
         if (!isNaN(mockDate.getTime())) {
           // Create a date with mock date but current time
@@ -145,7 +190,7 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
             now.getSeconds(),
             now.getMilliseconds()
           );
-          
+
           // Only log once when the app starts
           if (!getCurrentTime.hasLoggedMockDate) {
             logger.info(`Using mock date with real time: ${hybridTime.toISOString()}`);
@@ -167,52 +212,67 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
         }
       }
     }
-    
+
     // Default to actual current time
     return new Date();
   };
-  
+
   // Add static properties
   func.hasLoggedMockTime = false;
   func.hasLoggedMockDate = false;
   func.hasLoggedError = false;
-  
+
   return func;
 })();
 
-// Check if a given time is within the global Easter period
-export const isWithinGlobalEaster = (time: Date, easterDate: Date): boolean => {
-  const globalStart = getGlobalEasterStart(easterDate);
-  const globalEnd = getGlobalEasterEnd(easterDate);
-  
+/**
+ * Check if a given time is within the global holiday period.
+ * The global holiday period spans from when the holiday begins in the
+ * easternmost timezone (UTC+14) to when it ends in the westernmost
+ * timezone (UTC-12) - approximately 38 hours total.
+ */
+export const isWithinGlobalHoliday = (time: Date, holidayDateValue: Date): boolean => {
+  const globalStart = getGlobalHolidayStart(holidayDateValue);
+  const globalEnd = getGlobalHolidayEnd(holidayDateValue);
+
   return time >= globalStart && time <= globalEnd;
 };
 
-// Check if today is Easter (anywhere in the world)
-export const isEaster = (): boolean => {
+// Legacy alias for backward compatibility
+export const isWithinGlobalEaster = isWithinGlobalHoliday;
+
+/**
+ * Check if today is the holiday (anywhere in the world).
+ * Returns true if the current time falls within the extended global
+ * holiday window that covers all timezones.
+ */
+export const isHolidayDay = (): boolean => {
   const now = getCurrentTime();
   const currentYear = now.getFullYear();
-  const easterDate = getEasterDate(currentYear);
-  
-  // Check if we're in the global Easter period
-  if (isWithinGlobalEaster(now, easterDate)) {
+  const holidayDateThisYear = getHolidayDate(currentYear);
+
+  // Check if we're in the global holiday period
+  if (isWithinGlobalHoliday(now, holidayDateThisYear)) {
     return true;
   }
-  
-  // Also check the previous year's Easter (edge case at year boundary)
-  const lastYearEaster = getEasterDate(currentYear - 1);
-  if (isWithinGlobalEaster(now, lastYearEaster)) {
+
+  // Also check the previous year's holiday (edge case at year boundary)
+  const lastYearHoliday = getHolidayDate(currentYear - 1);
+  if (isWithinGlobalHoliday(now, lastYearHoliday)) {
     return true;
   }
-  
-  // Also check next year's Easter (edge case at year boundary)
-  const nextYearEaster = getEasterDate(currentYear + 1);
-  if (isWithinGlobalEaster(now, nextYearEaster)) {
+
+  // Also check next year's holiday (edge case at year boundary)
+  const nextYearHoliday = getHolidayDate(currentYear + 1);
+  if (isWithinGlobalHoliday(now, nextYearHoliday)) {
     return true;
   }
-  
+
   return false;
 };
+
+// Legacy alias for backward compatibility
+export const isEaster = isHolidayDay;
 
 // Format a date nicely with month name
 export const formatDate = (date: Date): string => {
@@ -220,85 +280,97 @@ export const formatDate = (date: Date): string => {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   });
 };
 
-// Get the next Easter date
-export const getNextEasterDate = (): Date => {
+/**
+ * Get the next holiday date (current year if not passed, otherwise next year).
+ */
+export const getNextHolidayDate = (): Date => {
   const now = getCurrentTime();
   const currentYear = now.getFullYear();
-  const easterThisYear = getEasterDate(currentYear);
-  
-  // If current time is before Easter this year, return this year's Easter
-  if (now < getGlobalEasterStart(easterThisYear)) {
-    return easterThisYear;
+  const holidayThisYear = getHolidayDate(currentYear);
+
+  // If current time is before holiday this year, return this year's holiday
+  if (now < getGlobalHolidayStart(holidayThisYear)) {
+    return holidayThisYear;
   }
-  
-  // If we're within Easter period, return this year's Easter
-  if (isWithinGlobalEaster(now, easterThisYear)) {
-    return easterThisYear;
+
+  // If we're within holiday period, return this year's holiday
+  if (isWithinGlobalHoliday(now, holidayThisYear)) {
+    return holidayThisYear;
   }
-  
-  // If Easter has passed, look to next year
-  return getEasterDate(currentYear + 1);
+
+  // If holiday has passed, look to next year
+  return getHolidayDate(currentYear + 1);
 };
 
-// Calculate global Easter progress percentage
-export const getGlobalEasterProgress = (): number => {
+// Legacy alias for backward compatibility
+export const getNextEasterDate = getNextHolidayDate;
+
+/**
+ * Calculate global holiday progress percentage.
+ * Returns a value from 0-100 representing how far through the global
+ * holiday window we currently are.
+ */
+export const getGlobalHolidayProgress = (): number => {
   const now = getCurrentTime();
   const currentYear = now.getFullYear();
-  
-  // Try this year's Easter
-  let easterDate = getEasterDate(currentYear);
-  let start = getGlobalEasterStart(easterDate);
-  let end = getGlobalEasterEnd(easterDate);
-  
-  // If not within this year's Easter period, try previous year
+
+  // Try this year's holiday
+  let holidayDateValue = getHolidayDate(currentYear);
+  let start = getGlobalHolidayStart(holidayDateValue);
+  let end = getGlobalHolidayEnd(holidayDateValue);
+
+  // If not within this year's holiday period, try previous year
   if (now < start || now > end) {
-    const previousEaster = getEasterDate(currentYear - 1);
-    const prevStart = getGlobalEasterStart(previousEaster);
-    const prevEnd = getGlobalEasterEnd(previousEaster);
-    
+    const previousHoliday = getHolidayDate(currentYear - 1);
+    const prevStart = getGlobalHolidayStart(previousHoliday);
+    const prevEnd = getGlobalHolidayEnd(previousHoliday);
+
     if (now >= prevStart && now <= prevEnd) {
       start = prevStart;
       end = prevEnd;
-      easterDate = previousEaster;
+      holidayDateValue = previousHoliday;
     }
   }
-  
-  // If not within this or previous year's Easter, try next year
+
+  // If not within this or previous year's holiday, try next year
   if (now < start || now > end) {
-    const nextEaster = getEasterDate(currentYear + 1);
-    const nextStart = getGlobalEasterStart(nextEaster);
-    const nextEnd = getGlobalEasterEnd(nextEaster);
-    
+    const nextHoliday = getHolidayDate(currentYear + 1);
+    const nextStart = getGlobalHolidayStart(nextHoliday);
+    const nextEnd = getGlobalHolidayEnd(nextHoliday);
+
     if (now >= nextStart && now <= nextEnd) {
       start = nextStart;
       end = nextEnd;
-      easterDate = nextEaster;
+      holidayDateValue = nextHoliday;
     }
   }
-  
-  // If not currently Easter, return 0
+
+  // If not currently holiday, return 0
   if (now < start || now > end) {
     return 0;
   }
-  
-  // Calculate progress through the entire global Easter period
-  const totalEasterMs = end.getTime() - start.getTime();
+
+  // Calculate progress through the entire global holiday period
+  const totalHolidayMs = end.getTime() - start.getTime();
   const elapsedMs = now.getTime() - start.getTime();
-  
+
   // Return percentage (0-100)
-  return (elapsedMs / totalEasterMs) * 100;
+  return (elapsedMs / totalHolidayMs) * 100;
 };
+
+// Legacy alias for backward compatibility
+export const getGlobalEasterProgress = getGlobalHolidayProgress;
 
 // Get timezone abbreviation based on offset in minutes
 export const getTimezoneAbbr = (timezoneOffset: number): string => {
   // Convert minutes to hours
   const hours = Math.abs(Math.floor(timezoneOffset / 60));
   const mins = Math.abs(timezoneOffset % 60);
-  
+
   // Format: UTC+/-HH:MM
   return `UTC${timezoneOffset <= 0 ? '+' : '-'}${hours.toString().padStart(2, '0')}${
     mins > 0 ? `:${mins.toString().padStart(2, '0')}` : ''
@@ -309,27 +381,32 @@ export const getTimezoneAbbr = (timezoneOffset: number): string => {
 export const getLocalMidnight = (date: Date, timezoneOffset: number): Date => {
   // Create a new date object to avoid modifying the original
   const localMidnight = new Date(date);
-  
+
   // Set to UTC midnight
   localMidnight.setUTCHours(0, 0, 0, 0);
-  
+
   // Adjust for the timezone offset
   // timezoneOffset is in minutes, negative for east, positive for west
   // But getTimezoneOffset() returns the opposite, so we invert it
   const adjustedOffset = -timezoneOffset;
   localMidnight.setMinutes(localMidnight.getMinutes() + adjustedOffset);
-  
+
   return localMidnight;
 };
 
-// Calculate the ideal arrival time for a city
-// (Should be around midnight on Easter morning in the local timezone)
-export const calculateIdealArrivalTime = (city: { timezone: string }, easterDate: Date): Date => {
+/**
+ * Calculate the ideal arrival time for a city.
+ * Should be around midnight on the holiday morning in the local timezone.
+ */
+export const calculateIdealArrivalTime = (
+  city: { timezone: string },
+  holidayDateValue: Date
+): Date => {
   // Parse the timezone from string format (e.g., "America/New_York")
   // For simplicity, we'll extract the UTC offset directly
   const timezoneMatch = city.timezone.match(/([+-])(\d{2}):?(\d{2})?/);
   let timezoneOffsetMinutes = 0;
-  
+
   if (timezoneMatch) {
     const sign = timezoneMatch[1] === '-' ? -1 : 1;
     const hours = parseInt(timezoneMatch[2], 10);
@@ -339,13 +416,20 @@ export const calculateIdealArrivalTime = (city: { timezone: string }, easterDate
     // If we can't parse, assume UTC
     logger.warn(`Could not parse timezone: ${city.timezone}, defaulting to UTC`);
   }
-  
-  // Get the Easter date and set it to local midnight
-  const idealTime = new Date(easterDate);
-  
+
+  // Get the holiday date and set it to local midnight
+  const idealTime = new Date(holidayDateValue);
+
   // Set to midnight UTC, then adjust by timezone offset
   idealTime.setUTCHours(0, 0, 0, 0);
   idealTime.setMinutes(idealTime.getMinutes() - timezoneOffsetMinutes);
-  
+
   return idealTime;
+};
+
+/**
+ * Get the current holiday name (for display purposes)
+ */
+export const getHolidayName = (): string => {
+  return holidayName;
 };

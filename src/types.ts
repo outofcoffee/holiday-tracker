@@ -12,7 +12,10 @@ export interface City {
 // Default map zoom level - single source of truth
 export const DEFAULT_MAP_ZOOM = 4;
 
-export interface BunnyPosition {
+/**
+ * Position of the holiday character (Easter Bunny, Santa, etc.)
+ */
+export interface CharacterPosition {
   latitude: number;
   longitude: number;
   currentCity: City | null;
@@ -23,8 +26,11 @@ export interface BunnyPosition {
   completionPercentage: number;
   transitionProgress: number;
   mapZoomLevel?: number; // Optional zoom level for position calculation
-  overLand: boolean; // Whether the bunny is currently over land (not ocean)
+  overLand: boolean; // Whether the character is currently over land (not ocean)
 }
+
+// Legacy alias for backward compatibility
+export type BunnyPosition = CharacterPosition;
 
 export interface ViewerLocation {
   latitude: number;
@@ -32,8 +38,14 @@ export interface ViewerLocation {
   nearestCity: City | null;
 }
 
-export interface EasterFact {
+/**
+ * A fact about the holiday to display
+ */
+export interface HolidayFact {
   id: number;
   text: string;
   country?: string;
 }
+
+// Legacy alias for backward compatibility
+export type EasterFact = HolidayFact;

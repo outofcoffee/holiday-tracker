@@ -7,10 +7,10 @@ import LocationInfo from './components/LocationInfo/LocationInfo';
 import DebugInfo from './components/UI/DebugInfo';
 import SleepingBunny from './components/UI/SleepingBunny';
 import { useTracker } from './hooks/useTracker';
-import { getRandomFact } from './data/easterFacts';
+import { getRandomFact, holidayMessages, holidayColors, holidaySleepingDecorations } from './config';
 
 function App() {
-  const { currentPosition, isEasterDay } = useTracker();
+  const { currentPosition, isHolidayDay } = useTracker();
   const [loading, setLoading] = useState(true);
   const [fact, setFact] = useState(getRandomFact());
 
@@ -34,14 +34,19 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-easter-blue/20">
+      <div
+        className="min-h-screen flex flex-col"
+        style={{ backgroundColor: `${holidayColors.secondary}33` }}
+      >
         <Header />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center p-8">
-            <div className="inline-block animate-hop mb-4">
-              <span className="text-5xl">🐰</span>
+            <div className="inline-block animate-bounce mb-4">
+              <span className="text-5xl">{holidaySleepingDecorations.characterEmoji}</span>
             </div>
-            <h2 className="text-xl font-bold text-easter-dark-purple">Loading the Easter Bunny Tracker...</h2>
+            <h2 className="text-xl font-bold" style={{ color: holidayColors.dark }}>
+              {holidayMessages.loadingMessage}
+            </h2>
             <p className="mt-3 text-gray-600 italic">{fact.text}</p>
           </div>
         </div>
@@ -51,52 +56,81 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-easter-blue/20">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: `${holidayColors.secondary}33` }}
+    >
       <Header />
-      
+
       <main className="flex-1 container mx-auto p-4 pb-8">
-        {isEasterDay ? (
+        {isHolidayDay ? (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Sidebar with stats */}
             <div className="lg:col-span-1 space-y-4">
               <ProgressTracker />
               <LocationInfo />
-              
-              {/* Easter Fact Card */}
+
+              {/* Fun Fact Card */}
               <div className="bg-white p-4 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold text-easter-green mb-3">Easter Fun Fact</h2>
-                <div className="bg-easter-yellow/40 p-3 rounded-lg">
+                <h2 className="text-xl font-bold mb-3" style={{ color: holidayColors.highlight }}>
+                  {holidayMessages.funFactTitle}
+                </h2>
+                <div
+                  className="p-3 rounded-lg"
+                  style={{ backgroundColor: `${holidayColors.accent}66` }}
+                >
                   <p className="italic">{fact.text}</p>
                 </div>
               </div>
             </div>
-            
+
             {/* Main map area */}
             <div className="lg:col-span-3 flex flex-col">
               <div className="h-[500px] mb-4">
                 <Map />
               </div>
-              
+
               {/* Current location banner with status indication */}
               {currentPosition?.currentCity && (
-                <div className={`mb-8 ${currentPosition.currentCity.id === currentPosition.nextCity?.id 
-                  ? 'bg-easter-pink animate-pulse' 
-                  : 'bg-easter-blue'} text-white p-3 rounded-lg text-center`}>
+                <div
+                  className="mb-8 text-white p-3 rounded-lg text-center"
+                  style={{
+                    backgroundColor:
+                      currentPosition.currentCity.id === currentPosition.nextCity?.id
+                        ? holidayColors.primary
+                        : holidayColors.secondary,
+                    animation:
+                      currentPosition.currentCity.id === currentPosition.nextCity?.id
+                        ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                        : 'none',
+                  }}
+                >
                   {currentPosition.currentCity.id === currentPosition.nextCity?.id ? (
                     // Delivering at a city
                     <div>
                       <p className="font-bold">
-                        The Easter Bunny is delivering baskets in {currentPosition.currentCity.name}, {currentPosition.currentCity.country}!
+                        {holidayMessages.deliveringMessage(
+                          currentPosition.currentCity.name,
+                          currentPosition.currentCity.country
+                        )}
                       </p>
-                      <p className="text-sm mt-1">Dropping off eggs and chocolate for the children!</p>
+                      <p className="text-sm mt-1">{holidayMessages.deliveringSubMessage}</p>
                     </div>
                   ) : (
                     // Traveling between cities
                     <div>
                       <p className="font-bold">
-                        The Easter Bunny is flying from {currentPosition.currentCity.name} to {currentPosition.nextCity?.name}!
+                        {holidayMessages.travelingMessage(
+                          currentPosition.currentCity.name,
+                          currentPosition.nextCity?.name || ''
+                        )}
                       </p>
-                      <p className="text-sm mt-1">Next delivery: {currentPosition.nextCity?.name}, {currentPosition.nextCity?.country}</p>
+                      <p className="text-sm mt-1">
+                        {holidayMessages.nextDeliveryMessage(
+                          currentPosition.nextCity?.name || '',
+                          currentPosition.nextCity?.country || ''
+                        )}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -109,7 +143,7 @@ function App() {
           </div>
         )}
       </main>
-      
+
       <Footer />
       <DebugInfo />
     </div>

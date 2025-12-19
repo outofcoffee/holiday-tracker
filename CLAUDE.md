@@ -1,192 +1,239 @@
-# Easter Bunny Tracker Implementation Plan
+# Holiday Tracker Implementation Plan
 
-## Implementation Status: ✅ Initial Version Complete
+## Implementation Status: ✅ Multi-Holiday Support Complete
 
 ## Overview
-A web application that tracks the Easter Bunny's journey on Easter day (April 20, 2025), showing its real-time location, animation, and delivery progress on an interactive map.
+A web application that tracks holiday characters (Easter Bunny or Santa) on their special days, showing their real-time location, animation, and delivery progress on an interactive map. The application supports multiple holidays through build-time configuration.
 
 ## Tech Stack
 - **Frontend**: React with TypeScript
-- **Build Tool**: Vite
-- **Styling**: TailwindCSS
+- **Build Tool**: Vite with custom plugins
+- **Styling**: TailwindCSS with dynamic inline styles
 - **Map**: Leaflet.js
 - **State Management**: React Context API
-- **Deployment**: Vercel/Netlify
+- **Configuration**: Build-time holiday configuration system
+- **Deployment**: Vercel/Netlify/GitHub Pages
+
+## Supported Holidays
+
+### Easter Bunny Tracker
+- **Date Calculation**: Uses Butcher's algorithm to calculate Easter date (varies yearly)
+- **Theme**: Pastel colors (pink, blue, yellow, purple, green)
+- **Character**: Easter Bunny
+- **Items**: Eggs, baskets, candy
+- **Facts**: Easter traditions from around the world
+
+### Santa Tracker
+- **Date Calculation**: Fixed date (December 25th)
+- **Theme**: Christmas colors (red, green, gold, white)
+- **Character**: Santa Claus
+- **Items**: Presents, stockings, candy canes
+- **Facts**: Christmas traditions from around the world
 
 ## Core Features
 
 ### 1. Map Visualisation
 - Interactive world map using Leaflet.js
-- Custom Easter-themed map style
+- Custom holiday-themed styling via configuration
 - Responsive design for all devices
 
-### 2. Easter Bunny Animation
-- Sprite-based animation for the bunny
-- Multiple animation states (hopping, delivering, resting)
+### 2. Character Animation
+- Sprite-based animation for the character
+- Multiple animation states (moving, delivering, resting)
 - Smooth transitions between locations
+- Configurable animation styles (hop for bunny, fly for sleigh)
 
 ### 3. Global Journey Planning
 - Pre-calculated path through major cities worldwide
 - Population-weighted city selection
 - Time-zone aware journey planning
+- Extended time window covering all timezones (~38 hours)
 - Interpolation for smooth transitions
 
 ### 4. Real-time Tracking
 - Time-based position calculation
 - Current location display with city/country name
 - Delivery progress statistics
-- Current time at bunny's location
+- Current time at character's location
 
-### 5. Easter Basket Counter
-- Calculate baskets based on world population and time progress
-- Animated counter for delivered baskets
+### 5. Item Counter
+- Calculate items delivered based on world population and time progress
+- Animated counter for delivered items
+- Configurable item names (baskets, presents)
 - Percentage of journey completed
 
 ### 6. Viewer Location Features
 - Browser geolocation API integration
 - Nearest city calculation
 - Local arrival time estimation
-- Special notification when bunny is nearby
+- Special notification when character is nearby
 
-### 7. Child-Friendly UI
-- Bright, colourful design
-- Simple language and explanations
-- Easter-themed decorations and animations
-- Fun facts about Easter traditions worldwide
+### 7. Holiday-Themed UI
+- Dynamic color schemes from configuration
+- Configurable messages and text
+- Holiday-themed decorations and animations
+- Fun facts about traditions worldwide
 
 ## Project Structure
 
 ```
-eastertracker/
+holiday-tracker/
 ├── src/
 │   ├── components/
 │   │   ├── Map/
-│   │   ├── BunnySprite/
+│   │   ├── BunnySprite/          # Character sprite (name kept for compat)
 │   │   ├── ProgressTracker/
 │   │   ├── LocationInfo/
 │   │   └── UI/
+│   ├── config/                    # NEW: Holiday configuration system
+│   │   ├── holiday.types.ts      # Type definitions
+│   │   ├── index.ts              # Main exports
+│   │   └── holidays/
+│   │       ├── index.ts          # Config loader
+│   │       ├── easter.ts         # Easter configuration
+│   │       └── christmas.ts      # Christmas configuration
 │   ├── data/
 │   │   ├── cities.ts
-│   │   ├── journeyCalculator.ts
-│   │   └── easterFacts.ts
+│   │   └── easterFacts.ts        # Re-exports from config
 │   ├── hooks/
-│   │   ├── useCurrentBunnyPosition.ts
-│   │   ├── useViewerLocation.ts
-│   │   └── useBasketCalculator.ts
+│   │   ├── useTracker.ts
+│   │   └── ...
 │   ├── context/
-│   │   └── TrackerContext.tsx
+│   │   ├── TrackerContext.tsx
+│   │   ├── TrackerContext.types.ts
+│   │   └── TrackerContextDefinition.ts
 │   ├── utils/
-│   │   ├── timeUtils.ts
+│   │   ├── timeUtils.ts          # Holiday date calculations
 │   │   ├── geoUtils.ts
+│   │   ├── basketCalculator.ts   # Item delivery calculations
 │   │   ├── landmassDetector.ts
-│   │   └── animationUtils.ts
+│   │   └── logger.ts
 │   ├── assets/
-│   │   ├── sprites/
-│   │   └── images/
 │   ├── App.tsx
 │   └── main.tsx
 ├── public/
-│   └── favicon.ico
+│   ├── assets/
+│   │   ├── icons8-easter-bunny-*.png
+│   │   ├── santa-sleigh-100.png  # Required for Christmas mode
+│   │   └── SANTA_ASSETS_README.md
+│   └── manifest.json             # Generated at build time
 ├── index.html
 ├── package.json
 ├── tsconfig.json
-├── vite.config.ts
+├── vite.config.ts                # Includes holiday plugins
 └── tailwind.config.js
 ```
 
-## Implementation Phases
+## Holiday Configuration System
 
-### Phase 1: Setup & Foundation
-1. Initialize React + TypeScript + Vite project
-2. Configure TailwindCSS
-3. Set up Leaflet map component
-4. Create basic layout and UI components
+### How It Works
 
-### Phase 2: Data & Logic
-1. Generate worldwide city database
-2. Implement journey calculation algorithm
-3. Create time-based position tracking
-4. Develop basket counter logic
+1. **Build-Time Selection**: Holiday mode is set via `VITE_HOLIDAY_MODE` environment variable
+2. **Config Files**: Each holiday has its own configuration file in `src/config/holidays/`
+3. **Runtime Access**: Configuration is imported and used throughout the app
+4. **HTML Generation**: Vite plugins update index.html and manifest.json at build time
 
-### Phase 3: Animation & Interaction
-1. Design and implement bunny sprite animation
-2. Add smooth path transitions
-3. Implement location details display
-4. Create progress visualisation
+### Configuration Structure
 
-### Phase 4: User Location & Personalisation
-1. Add geolocation detection
-2. Implement nearest city calculation
-3. Create local arrival time estimation
-4. Add special "nearby" notifications
+Each holiday config includes:
+- **id**: Unique identifier (`easter`, `christmas`)
+- **name**: Display name
+- **date**: Fixed or calculated date configuration
+- **messages**: All UI text (titles, notifications, etc.)
+- **colors**: Theme color palette (primary, secondary, accent, etc.)
+- **assets**: Character images and icons
+- **animations**: CSS animation configurations
+- **deliveryItems**: Items the character delivers
+- **sleepingDecorations**: Off-season decorations
+- **facts**: Holiday facts array
+- **itemsDeliveredName**: Label for counter (Baskets/Presents)
+- **peoplePerItem**: Ratio for calculations
 
-### Phase 5: Polish & Optimisation
-1. Refine UI/UX for child-friendliness
-2. Add Easter-themed decorations
-3. Optimise for performance
-4. Add loading states and error handling
-5. Test across devices and browsers
+### Build Commands
 
-## Key Technical Challenges
+```bash
+# Development
+npm run dev           # Easter mode (default)
+npm run dev:easter    # Easter mode
+npm run dev:christmas # Christmas mode
 
-1. **Global City Database**: Creating a comprehensive but optimised list of worldwide cities
-2. **Time-Based Positioning**: Calculating the bunny's position based on current time
-3. **Smooth Animation**: Ensuring fluid movement along the journey path
-4. **Performance**: Keeping the application responsive with animations and map rendering
-5. **Cross-Browser Compatibility**: Ensuring consistent experience across devices
+# Production
+npm run build           # Easter mode (default)
+npm run build:easter    # Easter mode
+npm run build:christmas # Christmas mode
+```
+
+## Extended Time Window Logic
+
+The tracker uses an extended time window to cover the holiday in ALL timezones:
+
+1. **Start**: When the holiday begins in UTC+14 (Kiritimati/Christmas Island)
+2. **End**: When the holiday ends in UTC-12 (Baker Island)
+3. **Total Window**: ~38 hours
+
+This ensures the character is active as long as it's the holiday anywhere in the world.
+
+### Date Calculations
+
+- **Easter**: Uses Butcher's algorithm in `timeUtils.ts`
+- **Christmas**: Fixed date (December 25th)
+
+Both support the extended global time window.
 
 ## Important Code Rules
 
-1. **NO HARDCODED VALUES**: Do not hardcode geographical coordinates in production files
-2. Always use async/await for data loading operations
-3. Implement proper error handling and fallbacks
-4. Test in both browser and Node.js environments
-5. Keep performance and memory usage in mind
+1. **NO HARDCODED VALUES**: All holiday-specific content is in configuration files
+2. **Use Configuration**: Import from `./config` for all holiday-specific values
+3. **Dynamic Styles**: Use inline styles for colors (Tailwind doesn't support dynamic classes)
+4. **Backward Compatibility**: Legacy function names preserved as aliases
+5. **Async/Await**: Use for data loading operations
+6. **Error Handling**: Implement proper fallbacks
+7. **Performance**: Keep memory usage in mind
+
+## Adding a New Holiday
+
+To add support for a new holiday:
+
+1. Create new config file: `src/config/holidays/newholiday.ts`
+2. Implement the `HolidayConfig` interface
+3. Add to the config map in `src/config/holidays/index.ts`
+4. Add build-time config in `vite.config.ts`
+5. Add npm scripts in `package.json`
+6. Add character assets to `public/assets/`
 
 ## Landmass Detection Implementation
 
 ### Design Approach
 
-The landmass detection module provides functionality to determine whether a geographical coordinate is over land or water. This implementation:
+The landmass detection module determines whether coordinates are over land or water:
 
 1. Uses a simple approach without hardcoded geographical coordinates
 2. Assumes coordinates are over land by default
 3. Maintains caching for performance optimization
 4. Preserves API compatibility with previous implementation
 
-### How It Works
+### API
 
-1. **Basic Detection**:
-   - Uses a simple approach that defaults to treating coordinates as land
-   - Water detection is handled through testing
-
-2. **Performance Optimization**:
-   - Results are cached for improved performance on repeated checks
-   - Cache precision is set to 3 decimal places (~100m precision)
-   - Cache size limits prevent memory leaks
-
-3. **API**:
-   - `isOverLand(latitude, longitude)`: Check if a position is over land
-   - `isOverLandAsync(latitude, longitude)`: Async version (for API consistency)
-   - `getLandmassName(latitude, longitude)`: Get the name of the landmass (returns "Land")
-   - `getLandmassNameAsync(latitude, longitude)`: Async version
-   - `preloadLandmassData()`: No-op function kept for API compatibility
-
-### Testing
-
-- Dedicated test function `__resetForTesting()` provided to clear caches and reset detector state
-- Test cases cover various geographical features and edge cases
-- Tests default to land in cases where detection is uncertain
+- `isOverLand(latitude, longitude)`: Check if a position is over land
+- `isOverLandAsync(latitude, longitude)`: Async version
+- `getLandmassName(latitude, longitude)`: Get landmass name
+- `getLandmassNameAsync(latitude, longitude)`: Async version
+- `preloadLandmassData()`: No-op for API compatibility
 
 ## Testing Strategy
+
 - Unit tests for utility functions and hooks
 - Component tests for UI elements
-- End-to-end tests for critical user flows
+- Test both holiday modes
+- Mock time testing via query parameters or environment variables
 - Performance testing for animation smoothness
 
 ## Future Enhancements
+
+- Additional holiday support (Diwali, Hanukkah, etc.)
 - Social sharing functionality
 - Interactive mini-games while waiting
 - Custom messages for specific locations
 - Historical journey replay
 - Multiple language support
+- PWA support
