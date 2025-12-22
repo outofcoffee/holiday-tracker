@@ -275,7 +275,7 @@ export const calculateCurrentPosition = async (mapZoomLevel?: number): Promise<B
     
     // Debug land detection
     const landmassName = getLandmassName(latitude, longitude);
-    logger.debug(`Bunny position: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+    logger.debug(`Character position: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
     logger.debug(`Landmass detection: ${overLand ? 'YES' : 'NO'}, name: ${landmassName || 'NONE'}`);
     
     // If bunny is over water during travel, try to find a nearby land point

@@ -115,9 +115,7 @@ export const getGlobalEasterEnd = getGlobalHolidayEnd;
 // Get current time, possibly overridden for testing
 interface GetCurrentTimeFunction {
   (): Date;
-  hasLoggedMockTime: boolean;
-  hasLoggedMockDate: boolean;
-  hasLoggedError: boolean;
+  hasLoggedStartup: boolean;
 }
 
 export const getCurrentTime = ((): GetCurrentTimeFunction => {
@@ -140,6 +138,14 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
       }
     }
 
+    // Log once on startup if override values are detected
+    if (!getCurrentTime.hasLoggedStartup && (mockTimeString || mockDateString)) {
+      console.log('[STARTUP] Time override detected:');
+      if (mockTimeString) console.log(`  mock_time: ${mockTimeString}`);
+      if (mockDateString) console.log(`  mock_date: ${mockDateString}`);
+      getCurrentTime.hasLoggedStartup = true;
+    }
+
     // VITE_MOCK_TIME takes precedence over VITE_MOCK_DATE
     if (mockTimeString) {
       try {
@@ -148,25 +154,12 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
 
         // Validate that the date is valid
         if (!isNaN(mockTime.getTime())) {
-          // Only log once when the app starts
-          if (!getCurrentTime.hasLoggedMockTime) {
-            logger.info(`Using mock time: ${mockTime.toISOString()}`);
-            getCurrentTime.hasLoggedMockTime = true;
-          }
           return mockTime;
         } else {
-          // Only log error once
-          if (!getCurrentTime.hasLoggedError) {
-            logger.error(`Invalid mock time format: ${mockTimeString}, using real time instead`);
-            getCurrentTime.hasLoggedError = true;
-          }
+          console.error(`[ERROR] Invalid mock_time format: ${mockTimeString}, using real time instead`);
         }
       } catch (error) {
-        // Only log error once
-        if (!getCurrentTime.hasLoggedError) {
-          logger.error(`Error parsing mock time: ${error}`);
-          getCurrentTime.hasLoggedError = true;
-        }
+        console.error(`[ERROR] Error parsing mock_time: ${error}`);
       }
     }
     // If no VITE_MOCK_TIME but VITE_MOCK_DATE is specified
@@ -191,25 +184,12 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
             now.getMilliseconds()
           );
 
-          // Only log once when the app starts
-          if (!getCurrentTime.hasLoggedMockDate) {
-            logger.info(`Using mock date with real time: ${hybridTime.toISOString()}`);
-            getCurrentTime.hasLoggedMockDate = true;
-          }
           return hybridTime;
         } else {
-          // Only log error once
-          if (!getCurrentTime.hasLoggedError) {
-            logger.error(`Invalid mock date format: ${mockDateString}, using real date instead`);
-            getCurrentTime.hasLoggedError = true;
-          }
+          console.error(`[ERROR] Invalid mock_date format: ${mockDateString}, using real date instead`);
         }
       } catch (error) {
-        // Only log error once
-        if (!getCurrentTime.hasLoggedError) {
-          logger.error(`Error parsing mock date: ${error}`);
-          getCurrentTime.hasLoggedError = true;
-        }
+        console.error(`[ERROR] Error parsing mock_date: ${error}`);
       }
     }
 
@@ -217,10 +197,8 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
     return new Date();
   };
 
-  // Add static properties
-  func.hasLoggedMockTime = false;
-  func.hasLoggedMockDate = false;
-  func.hasLoggedError = false;
+  // Add static property
+  func.hasLoggedStartup = false;
 
   return func;
 })();
