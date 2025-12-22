@@ -103,14 +103,22 @@ npm run build:easter
 npm run build:christmas
 ```
 
-### Adding Santa Assets
+#### Holiday-Specific Favicons
 
-For the Christmas mode, you need to add the Santa sleigh image:
+The project uses different favicons for each holiday:
 
-1. Place a `santa-sleigh-100.png` file in `public/assets/`
-2. The image should be approximately 100x100 pixels with a transparent background
+- **Easter icons**: Located in `public/icons-easter/`
+- **Christmas icons**: Located in `public/icons-christmas/`
 
-See `public/assets/SANTA_ASSETS_README.md` for more details.
+Each directory should contain:
+- `favicon.ico` - Multi-size ICO file
+- `favicon-16x16.png`, `favicon-32x32.png`, `favicon-48x48.png`
+- Apple touch icons in various sizes (57x57, 72x72, 114x114, 144x144, 152x152, 180x180)
+- `icon-192x192.png` for Android/Chrome
+
+During build, the Vite plugin automatically copies the correct icon set based on `VITE_HOLIDAY_MODE`.
+
+**Note**: Christmas icons need to be created. See `public/icons-christmas/README.md` for instructions.
 
 ### Testing with Mock Time
 

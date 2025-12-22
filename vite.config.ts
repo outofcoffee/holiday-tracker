@@ -45,11 +45,59 @@ function holidayHtmlPlugin(): Plugin {
   };
 }
 
-// Plugin to generate manifest.json based on holiday mode
+// Plugin to copy holiday-specific icons and generate manifest.json
 function holidayManifestPlugin(): Plugin {
   return {
     name: 'holiday-manifest-plugin',
     writeBundle() {
+      const distPath = path.resolve(__dirname, 'dist');
+      if (!fs.existsSync(distPath)) {
+        return;
+      }
+
+      // Copy holiday-specific icons to dist/icons
+      const sourceIconsDir = path.resolve(__dirname, `public/icons-${holidayMode}`);
+      const destIconsDir = path.join(distPath, 'icons');
+
+      // Create icons directory in dist
+      if (!fs.existsSync(destIconsDir)) {
+        fs.mkdirSync(destIconsDir, { recursive: true });
+      }
+
+      // Copy all icon files
+      if (fs.existsSync(sourceIconsDir)) {
+        const iconFiles = fs.readdirSync(sourceIconsDir).filter(
+          (file) => file.endsWith('.png') || file.endsWith('.ico')
+        );
+
+        if (iconFiles.length === 0) {
+          console.warn(
+            `\n⚠️  Warning: No icons found in ${sourceIconsDir}/\n` +
+              `   Please add ${holidayMode} favicons. See FAVICONS.md for instructions.\n`
+          );
+        } else {
+          iconFiles.forEach((file) => {
+            const sourcePath = path.join(sourceIconsDir, file);
+            const destPath = path.join(destIconsDir, file);
+            fs.copyFileSync(sourcePath, destPath);
+          });
+
+          // Also copy favicon.ico to root of dist
+          const faviconSource = path.join(sourceIconsDir, 'favicon.ico');
+          if (fs.existsSync(faviconSource)) {
+            fs.copyFileSync(faviconSource, path.join(distPath, 'favicon.ico'));
+          }
+
+          console.log(`✓ Copied ${iconFiles.length} ${holidayMode} icons to dist/icons/`);
+        }
+      } else {
+        console.warn(
+          `\n⚠️  Warning: Icons directory not found: ${sourceIconsDir}/\n` +
+            `   Please create it and add ${holidayMode} favicons. See FAVICONS.md for instructions.\n`
+        );
+      }
+
+      // Generate manifest.json
       const manifest = {
         name: holidayConfig.appName,
         short_name: holidayConfig.shortName,
@@ -72,11 +120,7 @@ function holidayManifestPlugin(): Plugin {
         ],
       };
 
-      // Write manifest to dist folder
-      const distPath = path.resolve(__dirname, 'dist');
-      if (fs.existsSync(distPath)) {
-        fs.writeFileSync(path.join(distPath, 'manifest.json'), JSON.stringify(manifest, null, 2));
-      }
+      fs.writeFileSync(path.join(distPath, 'manifest.json'), JSON.stringify(manifest, null, 2));
     },
   };
 }
@@ -94,6 +138,7 @@ export default defineConfig({
     // Make holiday mode available at runtime as well
     'import.meta.env.VITE_HOLIDAY_MODE': JSON.stringify(holidayMode),
   },
+  publicDir: 'public',
   server: {
     port: 3000,
     open: true,
