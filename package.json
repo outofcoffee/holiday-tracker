@@ -11,6 +11,8 @@
     "dev": "vite",
     "dev:easter": "VITE_HOLIDAY_MODE=easter vite",
     "dev:christmas": "VITE_HOLIDAY_MODE=christmas vite",
+    "dev:easter:mock": "VITE_HOLIDAY_MODE=easter VITE_MOCK_TIME=\"2026-04-05T01:00:00\" vite",
+    "dev:christmas:mock": "VITE_HOLIDAY_MODE=christmas VITE_MOCK_TIME=\"2025-12-24T23:59:30\" vite",
     "build": "tsc && vite build",
     "build:easter": "VITE_HOLIDAY_MODE=easter tsc && VITE_HOLIDAY_MODE=easter vite build",
     "build:christmas": "VITE_HOLIDAY_MODE=christmas tsc && VITE_HOLIDAY_MODE=christmas vite build",
