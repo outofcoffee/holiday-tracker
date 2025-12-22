@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useTracker } from '../../hooks/useTracker';
-import DeliveryBunny from '../BunnySprite/DeliveryBunny';
+import HolidayCharacter from '../CharacterSprite/HolidayCharacter';
 import { DEFAULT_MAP_ZOOM } from '../../types';
 import logger from '../../utils/logger';
 import 'leaflet/dist/leaflet.css';
@@ -25,10 +25,10 @@ const MapController = () => {
   const MIN_ZOOM = 3;
   const MAX_ZOOM = 8;
   
-  // Track when the bunny moves and update map view
+  // Track when the character moves and update map view
   useEffect(() => {
     if (currentPosition) {
-      // Move view to follow the bunny with current zoom level
+      // Move view to follow the character with current zoom level
       map.setView(
         [currentPosition.latitude, currentPosition.longitude],
         map.getZoom()
@@ -91,16 +91,16 @@ const Map = () => {
   const MIN_ZOOM = 3;
   const MAX_ZOOM = 8;
   
-  // Function to determine if the bunny is delivering at a city
-  const isDeliveringAtCity = currentPosition && 
-    currentPosition.currentCity && 
-    currentPosition.nextCity && 
+  // Function to determine if the character is delivering at a city
+  const isDeliveringAtCity = currentPosition &&
+    currentPosition.currentCity &&
+    currentPosition.nextCity &&
     currentPosition.currentCity.id === currentPosition.nextCity.id;
 
-  // Debug the delivery state  
+  // Debug the delivery state
   useEffect(() => {
     if (currentPosition) {
-      logger.debug('Current bunny position:', currentPosition);
+      logger.debug('Current character position:', currentPosition);
       logger.debug('Is delivering at city:', isDeliveringAtCity ? 'Yes' : 'No');
       logger.debug('Is over land:', currentPosition.overLand ? 'Yes' : 'No');
       logger.debug('Current city:', currentPosition.currentCity?.name);
@@ -120,14 +120,14 @@ const Map = () => {
   return (
     <div ref={containerRef} className="w-full h-full rounded-xl overflow-hidden shadow-lg">
       <MapContainer
-        center={currentPosition 
-          ? [currentPosition.latitude, currentPosition.longitude] 
+        center={currentPosition
+          ? [currentPosition.latitude, currentPosition.longitude]
           : defaultPosition}
         zoom={defaultZoom}
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
         zoomControl={true}
-        className="easter-map"
+        className="holiday-map"
         style={{ height: '100%', width: '100%' }}
       >
         <MapInitializer />
@@ -137,12 +137,12 @@ const Map = () => {
           minZoom={MIN_ZOOM}
           maxZoom={MAX_ZOOM}
         />
-        
-        {/* Easter Bunny Marker with delivery items */}
+
+        {/* Holiday Character Marker with delivery items */}
         {currentPosition && (
-          <DeliveryBunny position={[currentPosition.latitude, currentPosition.longitude]} />
+          <HolidayCharacter position={[currentPosition.latitude, currentPosition.longitude]} />
         )}
-        
+
         {/* User Location Marker */}
         {viewerLocation && (
           <Marker position={[viewerLocation.latitude, viewerLocation.longitude]}>
@@ -158,9 +158,9 @@ const Map = () => {
         )}
         
         <MapController />
-        
-        {/* 
-          Eggs and baskets are now handled directly by the BunnyMarker component
+
+        {/*
+          Delivery items are now handled directly by the HolidayCharacter component
           This is much more reliable and visually coherent
         */}
       </MapContainer>

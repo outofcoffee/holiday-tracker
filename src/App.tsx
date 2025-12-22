@@ -5,7 +5,7 @@ import Map from './components/Map/Map';
 import ProgressTracker from './components/ProgressTracker/ProgressTracker';
 import LocationInfo from './components/LocationInfo/LocationInfo';
 import DebugInfo from './components/UI/DebugInfo';
-import SleepingBunny from './components/UI/SleepingBunny';
+import OffSeasonCharacter from './components/UI/OffSeasonCharacter';
 import { useTracker } from './hooks/useTracker';
 import { getRandomFact, holidayMessages, holidayColors, holidaySleepingDecorations } from './config';
 
@@ -139,7 +139,7 @@ function App() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-lg">
-            <SleepingBunny />
+            <OffSeasonCharacter />
           </div>
         )}
       </main>

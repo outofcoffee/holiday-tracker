@@ -5,7 +5,7 @@ import { holidayMessages, holidayColors, holidaySleepingDecorations } from '../.
  * Component shown when it's not the holiday day.
  * Displays the sleeping/resting character with decorations.
  */
-const SleepingBunny = () => {
+const OffSeasonCharacter = () => {
   const { nextHolidayFormatted } = useTracker();
 
   // Format the comeback message with the date
@@ -65,4 +65,4 @@ const SleepingBunny = () => {
   );
 };
 
-export default SleepingBunny;
+export default OffSeasonCharacter;

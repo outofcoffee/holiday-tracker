@@ -10,7 +10,7 @@ import {
   holidayMessages,
   holidayColors,
 } from '../../config';
-import './delivery-bunny.css';
+import './holiday-character.css';
 
 // Build a lookup map for delivery items from config
 const deliveryItemsMap = new Map(holidayDeliveryItems.map((item) => [item.type, item]));
@@ -61,7 +61,7 @@ interface DeliveryItem {
 }
 
 // Main component
-const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) => {
+const HolidayCharacter: React.FC<{ position: [number, number] }> = ({ position }) => {
   const { currentPosition } = useTracker();
   const [fact, setFact] = useState(getRandomFact());
   const [isAtCity, setIsAtCity] = useState(false);
@@ -235,12 +235,12 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
 
   // Create custom character icon including delivery items
   const icon = L.divIcon({
-    className: 'delivery-bunny-container',
+    className: 'holiday-character-container',
     iconSize: [150, 150],
     iconAnchor: [75, 75],
     popupAnchor: [0, -75],
     html: `
-      <div class="delivery-bunny-marker">
+      <div class="holiday-character-marker">
         ${deliveryItems
           .map(
             (item) => `
@@ -272,7 +272,7 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
         `
           )
           .join('')}
-        <div class="bunny-image">
+        <div class="character-image">
           <img src="${holidayAssets.characterImage}" alt="${holidayAssets.characterAlt}" />
         </div>
       </div>
@@ -281,7 +281,7 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
 
   return (
     <Marker position={position} icon={icon} zIndexOffset={1000}>
-      <Popup className="bunny-popup">
+      <Popup className="character-popup">
         <div className="text-center">
           <h3 className="font-bold text-lg" style={{ color: holidayColors.primary }}>
             {holidayMessages.characterName}
@@ -312,4 +312,4 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
   );
 };
 
-export default DeliveryBunny;
+export default HolidayCharacter;
