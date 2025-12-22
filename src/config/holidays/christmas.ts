@@ -73,6 +73,7 @@ export const christmasConfig: HolidayConfig = {
     light: '#FFFAFA', // snow-white
     dark: '#8B0000', // dark-red
     highlight: '#00CED1', // ice-blue
+    mapBorder: '#2E7D32', // forest-green
   },
 
   assets: {

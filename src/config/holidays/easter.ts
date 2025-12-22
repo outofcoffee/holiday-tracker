@@ -72,6 +72,7 @@ export const easterConfig: HolidayConfig = {
     light: '#E6E6FA', // easter-purple
     dark: '#6A0DAD', // easter-dark-purple
     highlight: '#98FB98', // easter-green
+    mapBorder: '#FFB6C1', // easter-pink
   },
 
   assets: {

@@ -14,6 +14,11 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [fact, setFact] = useState(getRandomFact());
 
+  // Set CSS custom property for map border color
+  useEffect(() => {
+    document.documentElement.style.setProperty('--holiday-map-border-color', holidayColors.mapBorder);
+  }, []);
+
   // Simulate loading time to ensure all data is ready
   useEffect(() => {
     const timer = setTimeout(() => {
