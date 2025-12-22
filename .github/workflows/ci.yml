@@ -27,6 +27,9 @@ jobs:
     
     - name: Run linter
       run: npm run lint
-    
-    - name: Check build
-      run: npm run build
+
+    - name: Check Easter build
+      run: npm run build:easter
+
+    - name: Check Christmas build
+      run: npm run build:christmas

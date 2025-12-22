@@ -1,7 +1,7 @@
 # 🎄🐰 Holiday Tracker
 
-[![CI](https://github.com/outofcoffee/easter-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/outofcoffee/easter-tracker/actions/workflows/ci.yml)
-[![Deploy to GitHub Pages](https://github.com/outofcoffee/easter-tracker/actions/workflows/deploy.yml/badge.svg)](https://github.com/outofcoffee/easter-tracker/actions/workflows/deploy.yml)
+[![CI](https://github.com/outofcoffee/holiday-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/outofcoffee/holiday-tracker/actions/workflows/ci.yml)
+[![Deploy to GitHub Pages](https://github.com/outofcoffee/holiday-tracker/actions/workflows/deploy.yml/badge.svg)](https://github.com/outofcoffee/holiday-tracker/actions/workflows/deploy.yml)
 
 A fun, interactive web application that tracks holiday characters on their special days. Watch as the Easter Bunny hops around the world on Easter, or track Santa's sleigh on Christmas Eve!
 
@@ -38,11 +38,20 @@ This tracker supports multiple holidays with build-time configuration:
 - Vitest for testing
 - Build-time configuration for multi-holiday support
 
-## Live Demo
+## Live Demos
 
-Check out the Easter Bunny Tracker live at: [https://easterbunny.live](https://easterbunny.live)
+### Easter Bunny Tracker 🐰
+**Live at:** [https://easterbunny.live](https://easterbunny.live)
 
-Development version: [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
+Track the Easter Bunny's journey around the world on Easter Sunday!
+
+### Santa Tracker 🎅
+**Live at:** [https://tracker.christmas](https://tracker.christmas)
+
+Track Santa's journey around the world on Christmas Eve/Day!
+
+### Development Preview
+[https://outofcoffee.github.io/holiday-tracker/](https://outofcoffee.github.io/holiday-tracker/)
 
 ## Getting Started
 
@@ -61,8 +70,8 @@ The repository includes an `.nvmrc` file that specifies the correct version.
 
 ```bash
 # Clone the repository
-git clone https://github.com/outofcoffee/easter-tracker.git
-cd easter-tracker
+git clone https://github.com/outofcoffee/holiday-tracker.git
+cd holiday-tracker
 
 # Install dependencies
 npm install
@@ -167,7 +176,7 @@ holiday-tracker/
 ├── src/
 │   ├── components/
 │   │   ├── Map/              # Map and location components
-│   │   ├── BunnySprite/      # Character animation and marker
+│   │   ├── CharacterSprite/  # Character animation and marker
 │   │   ├── ProgressTracker/  # Delivery progress components
 │   │   ├── LocationInfo/     # User location components
 │   │   └── UI/               # Header, footer, and other UI
@@ -208,14 +217,14 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## Deployment and CI
 
-This project uses GitHub Actions for continuous integration and deployment.
+This project uses GitHub Actions for continuous integration and deployment to multiple domains.
 
 ### Continuous Integration (CI)
 
-The CI workflow runs on all pull requests to the main branch:
+The CI workflow runs on all pull requests and pushes to main/feature branches:
 1. Runs all tests
 2. Performs linting
-3. Verifies the build process
+3. Verifies both Easter and Christmas builds
 
 ### Deployment
 

@@ -83,7 +83,7 @@ function holidayManifestPlugin(): Plugin {
 
 let base = '/';
 if (process.env.GITHUB_PAGES === 'true') {
-  base = '/easter-tracker/';
+  base = '/holiday-tracker/';
 }
 
 // https://vitejs.dev/config/

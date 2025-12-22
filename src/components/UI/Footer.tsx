@@ -9,7 +9,7 @@ const Footer = () => {
       <p className="mt-1">{holidayMessages.footerDescription}</p>
       <p className="mt-2">
         <a
-          href="https://github.com/outofcoffee/easter-tracker"
+          href="https://github.com/outofcoffee/holiday-tracker"
           target="_blank"
           rel="noopener noreferrer"
           className="transition-colors flex items-center justify-center"
