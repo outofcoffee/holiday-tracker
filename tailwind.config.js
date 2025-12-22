@@ -3,6 +3,9 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        'title': ['"Henny Penny"', 'cursive'],
+      },
       colors: {
         // Legacy Easter colors for backward compatibility
         // Note: Dynamic holiday colors are now applied via inline styles

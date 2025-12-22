@@ -77,7 +77,7 @@ function App() {
 
               {/* Fun Fact Card */}
               <div className="bg-white p-4 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold mb-3" style={{ color: holidayColors.highlight }}>
+                <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.highlight }}>
                   {holidayMessages.funFactTitle}
                 </h2>
                 <div

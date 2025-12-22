@@ -56,7 +56,7 @@ const OffSeasonCharacter = () => {
       </div>
 
       <div className="mt-8 bg-white p-4 rounded-lg shadow-md max-w-lg">
-        <h3 className="font-bold text-lg mb-2" style={{ color: holidayColors.highlight }}>
+        <h3 className="font-title text-lg mb-2" style={{ color: holidayColors.highlight }}>
           Fun Fact
         </h3>
         <p>{holidayMessages.sleepingFunFact}</p>

@@ -8,7 +8,7 @@ const Header = () => {
         background: `linear-gradient(to right, ${holidayColors.primary}, ${holidayColors.light})`,
       }}
     >
-      <h1 className="text-3xl md:text-4xl font-bold">{holidayMessages.title}</h1>
+      <h1 className="text-3xl md:text-4xl font-title">{holidayMessages.title}</h1>
       <p className="text-lg mt-2">{holidayMessages.subtitle}</p>
     </header>
   );

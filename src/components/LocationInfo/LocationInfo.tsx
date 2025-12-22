@@ -45,7 +45,7 @@ const LocationInfo = () => {
   if (!viewerLocation) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-3" style={{ color: holidayColors.dark }}>
+        <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.dark }}>
           {holidayMessages.yourLocationTitle}
         </h2>
         {permissionStatus === 'denied' ? (
@@ -74,7 +74,7 @@ const LocationInfo = () => {
   if (!viewerLocation.nearestCity) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-3" style={{ color: holidayColors.dark }}>
+        <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.dark }}>
           {holidayMessages.yourLocationTitle}
         </h2>
         <p>Finding the nearest city to you...</p>
@@ -90,7 +90,7 @@ const LocationInfo = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-3" style={{ color: holidayColors.dark }}>
+      <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.dark }}>
         {holidayMessages.yourLocationTitle}
       </h2>
 
