@@ -1,2 +1,5 @@
 # Exclude original icons directory - we use icons-easter and icons-christmas instead
 /icons/
+
+# Exclude manifest.json - it's generated at build time by Vite plugin
+/manifest.json

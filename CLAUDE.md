@@ -81,20 +81,24 @@ holiday-tracker/
 ├── src/
 │   ├── components/
 │   │   ├── Map/
-│   │   ├── BunnySprite/          # Character sprite (name kept for compat)
+│   │   ├── CharacterSprite/      # Holiday character sprite (was BunnySprite)
+│   │   │   ├── HolidayCharacter.tsx
+│   │   │   └── holiday-character.css
 │   │   ├── ProgressTracker/
 │   │   ├── LocationInfo/
 │   │   └── UI/
-│   ├── config/                    # NEW: Holiday configuration system
-│   │   ├── holiday.types.ts      # Type definitions
-│   │   ├── index.ts              # Main exports
+│   │       ├── OffSeasonCharacter.tsx  # (was SleepingBunny)
+│   │       └── ...
+│   ├── config/                   # Holiday configuration system
+│   │   ├── holiday.types.ts     # Type definitions
+│   │   ├── index.ts             # Main exports
 │   │   └── holidays/
-│   │       ├── index.ts          # Config loader
-│   │       ├── easter.ts         # Easter configuration
-│   │       └── christmas.ts      # Christmas configuration
+│   │       ├── index.ts         # Config loader
+│   │       ├── easter.ts        # Easter configuration
+│   │       └── christmas.ts     # Christmas configuration
 │   ├── data/
 │   │   ├── cities.ts
-│   │   └── easterFacts.ts        # Re-exports from config
+│   │   └── easterFacts.ts       # Re-exports from config
 │   ├── hooks/
 │   │   ├── useTracker.ts
 │   │   └── ...
@@ -103,9 +107,9 @@ holiday-tracker/
 │   │   ├── TrackerContext.types.ts
 │   │   └── TrackerContextDefinition.ts
 │   ├── utils/
-│   │   ├── timeUtils.ts          # Holiday date calculations
+│   │   ├── timeUtils.ts         # Holiday date calculations
 │   │   ├── geoUtils.ts
-│   │   ├── basketCalculator.ts   # Item delivery calculations
+│   │   ├── basketCalculator.ts  # Item delivery calculations
 │   │   ├── landmassDetector.ts
 │   │   └── logger.ts
 │   ├── assets/
@@ -116,12 +120,17 @@ holiday-tracker/
 │   │   ├── icons8-easter-bunny-*.png
 │   │   ├── santa-sleigh-100.png  # Required for Christmas mode
 │   │   └── SANTA_ASSETS_README.md
-│   └── manifest.json             # Generated at build time
+│   ├── icons-easter/             # Easter-themed favicons
+│   ├── icons-christmas/          # Christmas-themed favicons
+│   └── manifest.json             # EXCLUDED - generated at build time
+├── docs/
+│   └── FAVICONS.md               # Favicon setup guide
 ├── index.html
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts                # Includes holiday plugins
-└── tailwind.config.js
+├── tailwind.config.js
+└── CLAUDE.md                     # This file - project documentation
 ```
 
 ## Holiday Configuration System
@@ -189,6 +198,34 @@ Both support the extended global time window.
 5. **Async/Await**: Use for data loading operations
 6. **Error Handling**: Implement proper fallbacks
 7. **Performance**: Keep memory usage in mind
+8. **Documentation**: Keep detailed documentation in the `docs/` folder, not in the project root
+
+## Favicons and Manifests
+
+### Directory Structure
+
+Each holiday has its own set of favicons:
+- **Easter**: `public/icons-easter/` - Pastel bunny-themed icons
+- **Christmas**: `public/icons-christmas/` - Santa/Christmas-themed icons
+
+### Build-Time Generation
+
+The Vite plugin `holidayManifestPlugin` automatically:
+1. Copies the correct icon set from `public/icons-${holiday}/` → `dist/icons/`
+2. Copies `favicon.ico` to the root of `dist/`
+3. **Generates `manifest.json`** with holiday-specific metadata:
+   - Name, short name, description
+   - Theme color
+   - Icon references
+
+### Required Files
+
+Each holiday icon directory must contain:
+- `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png`, `favicon-48x48.png`
+- Apple touch icons (57x57, 72x72, 114x114, 144x144, 152x152, 180x180)
+- `icon-192x192.png` for Android/Chrome
+
+See `docs/FAVICONS.md` for detailed instructions on creating icons.
 
 ## Adding a New Holiday
 
@@ -200,6 +237,7 @@ To add support for a new holiday:
 4. Add build-time config in `vite.config.ts`
 5. Add npm scripts in `package.json`
 6. Add character assets to `public/assets/`
+7. Create favicon set in `public/icons-newholiday/` (see `docs/FAVICONS.md`)
 
 ## Landmass Detection Implementation
 

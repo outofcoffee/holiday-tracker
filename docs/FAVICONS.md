@@ -59,20 +59,9 @@ Each holiday icon directory must contain:
 ### Android/Chrome
 - `icon-192x192.png` - Android Chrome home screen
 
-## Creating Christmas Icons
+## Creating Icons
 
-Christmas icons still need to be created. Here's how:
-
-### Option 1: Using Online Tools
-
-1. Create or find a 512x512 Santa/Christmas themed image (PNG with transparency)
-2. Use [RealFaviconGenerator](https://realfavicongenerator.net/):
-   - Upload your 512x512 image
-   - Configure options
-   - Download the generated icon pack
-   - Extract to `public/icons-christmas/`
-
-### Option 2: Using ImageMagick
+### Using ImageMagick
 
 ```bash
 # Install ImageMagick if needed
@@ -100,14 +89,23 @@ convert santa-source-512.png -resize 48x48 \
         favicon.ico
 ```
 
+### Creating ICO files on Mac
+
+If ImageMagick isn't creating proper ICO files:
+
+```bash
+# Use png2ico (install via npm)
+npm install -g png2ico
+
+# Create ICO from PNGs
+png2ico favicon.ico favicon-16x16.png favicon-32x32.png favicon-48x48.png
+```
+
 ### Design Guidelines
 
 Christmas icons should:
-- Feature Santa or Christmas elements (sleigh, presents, Santa hat, etc.)
-- Use Christmas colors: red (#DC143C), green, white, gold
 - Be clear and recognizable at small sizes (16x16)
 - Have transparent or white background
-- Match the festive theme of tracker.christmas
 
 ### Testing Icons
 
@@ -124,33 +122,6 @@ ls -la dist/favicon.ico
 # Start a local server to test
 npx serve dist
 # Visit http://localhost:3000 and check the favicon in browser tab
-```
-
-## Troubleshooting
-
-### Icons not updating after build
-
-1. Clear your browser cache
-2. Hard refresh (Cmd+Shift+R on Mac, Ctrl+Shift+R on Windows)
-3. Check `dist/icons/` contains the expected files
-4. Verify `dist/manifest.json` has correct icon references
-
-### Wrong icons showing
-
-1. Confirm you're using the correct build command (`build:easter` vs `build:christmas`)
-2. Check `VITE_HOLIDAY_MODE` environment variable
-3. Rebuild the project: `npm run build:christmas` or `npm run build:easter`
-
-### Creating ICO files on Mac
-
-If ImageMagick isn't creating proper ICO files:
-
-```bash
-# Use png2ico (install via npm)
-npm install -g png2ico
-
-# Create ICO from PNGs
-png2ico favicon.ico favicon-16x16.png favicon-32x32.png favicon-48x48.png
 ```
 
 ## References
