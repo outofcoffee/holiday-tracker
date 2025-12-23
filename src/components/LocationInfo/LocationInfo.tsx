@@ -44,25 +44,26 @@ const LocationInfo = () => {
   // Handle prompt permission or loading state
   if (!viewerLocation) {
     return (
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.dark }}>
+      <div className="glass-card p-6">
+        <h2
+          className="text-xl font-title font-semibold mb-4 flex items-center gap-2"
+          style={{ color: holidayColors.dark }}
+        >
+          <span className="text-2xl">📍</span>
           {holidayMessages.yourLocationTitle}
         </h2>
         {permissionStatus === 'denied' ? (
-          <div>
-            <p>{holidayMessages.locationPermissionRequest}</p>
-            <p className="text-sm mt-2 text-gray-500">
+          <div className="text-center">
+            <p className="text-gray-600 mb-2">{holidayMessages.locationPermissionRequest}</p>
+            <p className="text-sm text-gray-400">
               Check your browser's permissions settings for this site.
             </p>
           </div>
         ) : (
-          <div>
-            <p>{holidayMessages.locationPrompt}</p>
-            <div className="mt-3 flex justify-center">
-              <div
-                className="w-6 h-6 border-4 border-t-transparent rounded-full animate-spin"
-                style={{ borderColor: `${holidayColors.primary} transparent transparent transparent` }}
-              ></div>
+          <div className="text-center">
+            <p className="text-gray-600 mb-4">{holidayMessages.locationPrompt}</p>
+            <div className="flex justify-center">
+              <div className="spinner" style={{ color: holidayColors.primary }} />
             </div>
           </div>
         )}
@@ -73,54 +74,68 @@ const LocationInfo = () => {
   // If we have location but no nearest city yet
   if (!viewerLocation.nearestCity) {
     return (
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.dark }}>
+      <div className="glass-card p-6">
+        <h2
+          className="text-xl font-title font-semibold mb-4 flex items-center gap-2"
+          style={{ color: holidayColors.dark }}
+        >
+          <span className="text-2xl">📍</span>
           {holidayMessages.yourLocationTitle}
         </h2>
-        <p>Finding the nearest city to you...</p>
-        <div className="mt-3 flex justify-center">
-          <div
-            className="w-6 h-6 border-4 border-t-transparent rounded-full animate-spin"
-            style={{ borderColor: `${holidayColors.primary} transparent transparent transparent` }}
-          ></div>
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Finding the nearest city to you...</p>
+          <div className="flex justify-center">
+            <div className="spinner" style={{ color: holidayColors.primary }} />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.dark }}>
+    <div className="glass-card p-6">
+      <h2
+        className="text-xl font-title font-semibold mb-4 flex items-center gap-2"
+        style={{ color: holidayColors.dark }}
+      >
+        <span className="text-2xl">📍</span>
         {holidayMessages.yourLocationTitle}
       </h2>
 
       <div className="text-center">
-        <p className="font-medium">
-          You're near {viewerLocation.nearestCity.name}, {viewerLocation.nearestCity.country}
+        <p className="text-sm text-gray-500 mb-1">You're near</p>
+        <p className="font-semibold text-lg" style={{ color: holidayColors.dark }}>
+          {viewerLocation.nearestCity.name}, {viewerLocation.nearestCity.country}
         </p>
 
         {isNearby ? (
           <div
-            className="mt-4 p-3 rounded-lg animate-pulse"
-            style={{ backgroundColor: holidayColors.primary }}
+            className="mt-4 p-4 rounded-xl text-white"
+            style={{
+              backgroundColor: holidayColors.primary,
+              animation: 'gentle-pulse 2s ease-in-out infinite',
+            }}
           >
-            <p className="font-bold text-white">{holidayMessages.nearbyNotification}</p>
-            <p className="text-white text-sm">{holidayMessages.nearbySubMessage}</p>
+            <p className="font-bold">{holidayMessages.nearbyNotification}</p>
+            <p className="text-sm opacity-90 mt-1">{holidayMessages.nearbySubMessage}</p>
           </div>
         ) : estimatedArrivalTime ? (
-          <div className="mt-4">
-            <p className="text-sm">
+          <div className="mt-4 stat-card">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
               {formatTime(getCurrentTime()) > estimatedArrivalTime
                 ? holidayMessages.visitedLabel
                 : holidayMessages.willVisitLabel}
             </p>
-            <p className="text-2xl font-bold mt-1" style={{ color: holidayColors.dark }}>
+            <p
+              className="text-3xl font-bold"
+              style={{ color: holidayColors.dark }}
+            >
               {estimatedArrivalTime}
             </p>
           </div>
         ) : (
           <div className="mt-4">
-            <p className="text-sm">{holidayMessages.calculatingVisit}</p>
+            <p className="text-sm text-gray-500">{holidayMessages.calculatingVisit}</p>
           </div>
         )}
       </div>

@@ -88,6 +88,7 @@ export interface HolidayColors {
   dark: string;
   highlight: string;
   mapBorder: string;
+  gradient: string;
 }
 
 /**

@@ -4,7 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'title': ['"Henny Penny"', 'cursive'],
+        'title': ['Fredoka', 'sans-serif'],
+        'body': ['Nunito', 'sans-serif'],
       },
       colors: {
         // Legacy Easter colors for backward compatibility

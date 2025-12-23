@@ -6,51 +6,66 @@ const ProgressTracker = () => {
   const { itemsDelivered, completionPercentage, currentPosition } = useTracker();
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-      <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.dark }}>
+    <div className="glass-card p-6">
+      <h2
+        className="text-xl font-title font-semibold mb-5 flex items-center gap-2"
+        style={{ color: holidayColors.dark }}
+      >
+        <span className="text-2xl">📊</span>
         {holidayMessages.progressTitle}
       </h2>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="text-center">
-          <h3 className="text-md font-semibold">{holidayMessages.itemsDeliveredLabel}</h3>
-          <div
-            className="text-2xl font-bold animate-bounce"
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <div className="stat-card">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+            {holidayMessages.itemsDeliveredLabel}
+          </p>
+          <p
+            className="text-2xl font-bold counter-value"
             style={{ color: holidayColors.primary }}
           >
             {formatNumber(itemsDelivered)}
-          </div>
-        </div>
-
-        <div className="text-center">
-          <h3 className="text-md font-semibold">{holidayMessages.journeyCompleteLabel}</h3>
-          <div className="text-2xl font-bold" style={{ color: holidayColors.highlight }}>
-            {Math.round(completionPercentage)}%
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <div className="w-full bg-gray-200 rounded-full h-4">
-          <div
-            className="h-4 rounded-full transition-all duration-500"
-            style={{
-              width: `${completionPercentage}%`,
-              backgroundColor: holidayColors.primary,
-            }}
-          ></div>
-        </div>
-      </div>
-
-      <div className="mt-4 text-center">
-        {currentPosition?.currentCity && (
-          <p className="font-medium">
-            Currently in {currentPosition.currentCity.name}, {currentPosition.currentCity.country}
           </p>
+        </div>
+
+        <div className="stat-card">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+            {holidayMessages.journeyCompleteLabel}
+          </p>
+          <p
+            className="text-2xl font-bold"
+            style={{ color: holidayColors.highlight }}
+          >
+            {Math.round(completionPercentage)}%
+          </p>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="progress-bar-container">
+        <div
+          className="progress-bar-fill"
+          style={{
+            width: `${completionPercentage}%`,
+            background: `linear-gradient(90deg, ${holidayColors.primary}, ${holidayColors.highlight})`,
+          }}
+        />
+      </div>
+
+      {/* Current Location */}
+      <div className="mt-5 pt-4 border-t border-gray-100">
+        {currentPosition?.currentCity && (
+          <div className="text-center">
+            <p className="text-sm text-gray-500 mb-1">Currently in</p>
+            <p className="font-semibold" style={{ color: holidayColors.dark }}>
+              {currentPosition.currentCity.name}, {currentPosition.currentCity.country}
+            </p>
+          </div>
         )}
         {currentPosition?.nextCity &&
           currentPosition.nextCity.id !== currentPosition?.currentCity?.id && (
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-500 mt-2 text-center">
               Next stop: {currentPosition.nextCity.name}, {currentPosition.nextCity.country}
             </p>
           )}

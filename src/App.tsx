@@ -14,9 +14,10 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [fact, setFact] = useState(getRandomFact());
 
-  // Set CSS custom property for map border color
+  // Set CSS custom properties for theming
   useEffect(() => {
     document.documentElement.style.setProperty('--holiday-map-border-color', holidayColors.mapBorder);
+    document.documentElement.style.setProperty('--holiday-primary', holidayColors.primary);
   }, []);
 
   // Simulate loading time to ensure all data is ready
@@ -41,18 +42,24 @@ function App() {
     return (
       <div
         className="min-h-screen flex flex-col"
-        style={{ backgroundColor: `${holidayColors.secondary}33` }}
+        style={{ background: holidayColors.gradient }}
       >
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-center p-8">
-            <div className="inline-block animate-bounce mb-4">
-              <span className="text-5xl">{holidaySleepingDecorations.characterEmoji}</span>
+          <div className="glass-card-solid p-10 text-center max-w-md mx-4">
+            <div className="inline-block mb-6">
+              <span className="text-7xl">{holidaySleepingDecorations.characterEmoji}</span>
             </div>
-            <h2 className="text-xl font-bold" style={{ color: holidayColors.dark }}>
+            <h2
+              className="text-2xl font-title font-semibold mb-4"
+              style={{ color: holidayColors.dark }}
+            >
               {holidayMessages.loadingMessage}
             </h2>
-            <p className="mt-3 text-gray-600 italic">{fact.text}</p>
+            <p className="text-gray-600 italic leading-relaxed">{fact.text}</p>
+            <div className="mt-6 flex justify-center">
+              <div className="spinner" style={{ color: holidayColors.primary }} />
+            </div>
           </div>
         </div>
         <Footer />
@@ -63,74 +70,55 @@ function App() {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ backgroundColor: `${holidayColors.secondary}33` }}
+      style={{ background: holidayColors.gradient }}
     >
       <Header />
 
-      <main className="flex-1 container mx-auto p-4 pb-8">
+      <main className="flex-1 container mx-auto px-4 py-6 max-w-7xl">
         {isHolidayDay ? (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            {/* Sidebar with stats */}
-            <div className="lg:col-span-1 space-y-4">
-              <ProgressTracker />
-              <LocationInfo />
-
-              {/* Fun Fact Card */}
-              <div className="bg-white p-4 rounded-lg shadow-md">
-                <h2 className="text-xl font-title mb-3" style={{ color: holidayColors.highlight }}>
-                  {holidayMessages.funFactTitle}
-                </h2>
-                <div
-                  className="p-3 rounded-lg"
-                  style={{ backgroundColor: `${holidayColors.accent}66` }}
-                >
-                  <p className="italic">{fact.text}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Main map area */}
-            <div className="lg:col-span-3 flex flex-col">
-              <div className="h-[500px] mb-4">
+          <div className="space-y-6">
+            {/* Hero Map Section */}
+            <div className="relative">
+              <div className="h-[60vh] min-h-[400px] max-h-[600px] rounded-3xl overflow-hidden shadow-2xl">
                 <Map />
               </div>
 
-              {/* Current location banner with status indication */}
+              {/* Floating Status Banner */}
               {currentPosition?.currentCity && (
                 <div
-                  className="mb-8 text-white p-3 rounded-lg text-center"
+                  className={`absolute bottom-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto md:min-w-[400px] md:max-w-[600px] status-banner text-white text-center ${
+                    currentPosition.currentCity.id === currentPosition.nextCity?.id
+                      ? 'delivering'
+                      : ''
+                  }`}
                   style={{
                     backgroundColor:
                       currentPosition.currentCity.id === currentPosition.nextCity?.id
                         ? holidayColors.primary
                         : holidayColors.secondary,
-                    animation:
-                      currentPosition.currentCity.id === currentPosition.nextCity?.id
-                        ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                        : 'none',
                   }}
                 >
                   {currentPosition.currentCity.id === currentPosition.nextCity?.id ? (
-                    // Delivering at a city
                     <div>
-                      <p className="font-bold">
+                      <p className="font-semibold text-lg">
                         {holidayMessages.deliveringMessage(
                           currentPosition.currentCity.name,
                           currentPosition.currentCity.country
                         )}
                       </p>
-                      <p className="text-sm mt-1">{holidayMessages.deliveringSubMessage}</p>
+                      <p className="text-sm mt-1 opacity-90">
+                        {holidayMessages.deliveringSubMessage}
+                      </p>
                     </div>
                   ) : (
-                    // Traveling between cities
                     <div>
-                      <p className="font-bold">
+                      <p className="font-semibold text-lg">
                         {holidayMessages.travelingMessage(
                           currentPosition.currentCity.name,
                           currentPosition.nextCity?.name || ''
                         )}
                       </p>
-                      <p className="text-sm mt-1">
+                      <p className="text-sm mt-1 opacity-90">
                         {holidayMessages.nextDeliveryMessage(
                           currentPosition.nextCity?.name || '',
                           currentPosition.nextCity?.country || ''
@@ -141,9 +129,41 @@ function App() {
                 </div>
               )}
             </div>
+
+            {/* Info Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Progress Card */}
+              <ProgressTracker />
+
+              {/* Location Card */}
+              <LocationInfo />
+
+              {/* Fun Fact Card */}
+              <div
+                className="glass-card p-6 fact-card"
+                style={
+                  {
+                    '--fact-accent': holidayColors.primary,
+                  } as React.CSSProperties
+                }
+              >
+                <div
+                  className="absolute top-0 left-0 w-1 h-full rounded-l-xl"
+                  style={{ backgroundColor: holidayColors.primary }}
+                />
+                <h2
+                  className="text-xl font-title font-semibold mb-4 flex items-center gap-2"
+                  style={{ color: holidayColors.dark }}
+                >
+                  <span className="text-2xl">💡</span>
+                  {holidayMessages.funFactTitle}
+                </h2>
+                <p className="text-gray-700 leading-relaxed italic">{fact.text}</p>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-lg">
+          <div className="glass-card-solid overflow-hidden">
             <OffSeasonCharacter />
           </div>
         )}

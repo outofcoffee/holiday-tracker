@@ -67,13 +67,14 @@ export const christmasConfig: HolidayConfig = {
   },
 
   colors: {
-    primary: '#DC143C', // christmas-red
-    secondary: '#228B22', // christmas-green
-    accent: '#FFD700', // christmas-gold
-    light: '#FFFAFA', // snow-white
-    dark: '#8B0000', // dark-red
-    highlight: '#00CED1', // ice-blue
-    mapBorder: '#2E7D32', // forest-green
+    primary: '#C41E3A', // Cardinal red - rich and elegant
+    secondary: '#1B5E20', // Deep forest green - sophisticated
+    accent: '#D4AF37', // Old gold - refined metallic
+    light: '#FAFBFC', // Clean off-white
+    dark: '#2D1810', // Deep espresso - excellent readability
+    highlight: '#5C9EAD', // Winter teal - modern accent
+    mapBorder: '#2E5744', // Dark sage green
+    gradient: 'linear-gradient(135deg, #F5E6E8 0%, #E8F0E8 50%, #FDF8E8 100%)', // Warm holiday gradient
   },
 
   assets: {

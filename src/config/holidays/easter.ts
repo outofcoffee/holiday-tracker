@@ -66,13 +66,14 @@ export const easterConfig: HolidayConfig = {
   },
 
   colors: {
-    primary: '#FFB6C1', // easter-pink
-    secondary: '#ADD8E6', // easter-blue
-    accent: '#FFFACD', // easter-yellow
-    light: '#E6E6FA', // easter-purple
-    dark: '#6A0DAD', // easter-dark-purple
-    highlight: '#98FB98', // easter-green
-    mapBorder: '#FFB6C1', // easter-pink
+    primary: '#E8A0B0', // Soft rose - more sophisticated pink
+    secondary: '#B8D4E8', // Soft sky blue - refined
+    accent: '#F5E6A3', // Warm buttercream - softer yellow
+    light: '#F8F4FF', // Very light lavender - clean background
+    dark: '#4A3B5C', // Deep plum - better readability
+    highlight: '#7EB89A', // Sage green - more refined
+    mapBorder: '#D4A5B5', // Dusty rose - subtle border
+    gradient: 'linear-gradient(135deg, #F8E8EC 0%, #E8F4F8 50%, #F5F0E8 100%)', // Soft multi-tone gradient
   },
 
   assets: {
