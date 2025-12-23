@@ -33,7 +33,7 @@ const OffSeasonCharacter = () => {
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold mb-3" style={{ color: holidayColors.light }}>
+        <h2 className="text-2xl font-bold mb-3" style={{ color: holidayColors.primary }}>
           {holidayMessages.sleepingTitle}
         </h2>
         <p className="text-gray-600 mb-4">{holidayMessages.sleepingDescription}</p>
