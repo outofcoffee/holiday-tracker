@@ -1,15 +1,34 @@
 import { useTracker } from '../../hooks/useTracker';
 import { holidayMessages, holidayColors, holidaySleepingDecorations } from '../../config';
+import { getGlobalHolidayStart } from '../../utils/timeUtils';
 
 /**
  * Component shown when it's not the holiday day.
  * Displays the sleeping/resting character with decorations.
  */
 const OffSeasonCharacter = () => {
-  const { nextHolidayFormatted } = useTracker();
+  const { nextHolidayDate } = useTracker();
 
-  // Format the comeback message with the date
-  const comeBackMessage = holidayMessages.comeBackMessage.replace('{date}', nextHolidayFormatted);
+  // Get the global start time (when tracking begins in the earliest timezone)
+  const globalStartTime = getGlobalHolidayStart(nextHolidayDate);
+
+  // Format the start time in the user's local timezone
+  const formatStartTime = (date: Date): string => {
+    const dayOfWeek = date.toLocaleDateString(undefined, { weekday: 'long' });
+    const monthDay = date.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+    const time = date.toLocaleTimeString(undefined, {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+
+    return `${dayOfWeek}, ${monthDay} at ${time}`;
+  };
+
+  const formattedStartTime = formatStartTime(globalStartTime);
+
+  // Format the comeback message with the start time
+  const comeBackMessage = holidayMessages.comeBackMessage.replace('{date}', formattedStartTime);
 
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4">
