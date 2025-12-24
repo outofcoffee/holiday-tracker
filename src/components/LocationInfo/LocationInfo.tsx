@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useTracker } from '../../hooks/useTracker';
 import { getCurrentTime, getHolidayDate, calculateIdealArrivalTime } from '../../utils/timeUtils';
-import { holidayMessages, holidayColors } from '../../config';
+import { holidayMessages, holidayColors, holidayConfig } from '../../config';
 import logger from '../../utils/logger';
 
 const LocationInfo = () => {
   const { viewerLocation, estimatedArrivalTime, isNearby, isHolidayDay } = useTracker();
   const [permissionStatus, setPermissionStatus] = useState<string>('prompt');
   const [hasVisited, setHasVisited] = useState<boolean>(false);
+  const [treatChoice, setTreatChoice] = useState<'yes' | 'no' | null>(null);
+  const [showResponse, setShowResponse] = useState<boolean>(false);
 
   // Calculate whether the holiday character has already visited based on actual arrival time
   useEffect(() => {
@@ -38,6 +40,44 @@ const LocationInfo = () => {
     const interval = setInterval(calculateVisitStatus, 60000);
     return () => clearInterval(interval);
   }, [viewerLocation?.nearestCity, isHolidayDay]);
+
+  // Load treat choice from localStorage when user has been visited
+  useEffect(() => {
+    if (!hasVisited || !isHolidayDay) {
+      setTreatChoice(null);
+      setShowResponse(false);
+      return;
+    }
+
+    try {
+      const year = new Date().getFullYear();
+      const storageKey = `holiday-treat-choice-${holidayConfig.id}-${year}`;
+      const saved = localStorage.getItem(storageKey);
+
+      if (saved === 'yes' || saved === 'no') {
+        setTreatChoice(saved);
+        setShowResponse(true);
+      }
+    } catch (error) {
+      // localStorage unavailable, silently continue without persistence
+      logger.debug('localStorage unavailable for treat choice');
+    }
+  }, [hasVisited, isHolidayDay]);
+
+  // Handler for treat choice
+  const handleTreatChoice = (choice: 'yes' | 'no') => {
+    setTreatChoice(choice);
+    setShowResponse(true);
+
+    try {
+      const year = new Date().getFullYear();
+      const storageKey = `holiday-treat-choice-${holidayConfig.id}-${year}`;
+      localStorage.setItem(storageKey, choice);
+    } catch (error) {
+      // localStorage unavailable, choice just won't persist
+      logger.debug('Could not save treat choice to localStorage');
+    }
+  };
 
   // Check geolocation permission status - only if it's the holiday day
   useEffect(() => {
@@ -151,19 +191,79 @@ const LocationInfo = () => {
             <p className="text-sm opacity-90 mt-1">{holidayMessages.nearbySubMessage}</p>
           </div>
         ) : estimatedArrivalTime ? (
-          <div className="mt-4 stat-card">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-              {hasVisited
-                ? holidayMessages.visitedLabel
-                : holidayMessages.willVisitLabel}
-            </p>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: holidayColors.dark }}
-            >
-              {estimatedArrivalTime}
-            </p>
-          </div>
+          <>
+            <div className="mt-4 stat-card">
+              {hasVisited ? (
+                <p
+                  className="text-lg font-bold"
+                  style={{ color: holidayColors.dark }}
+                >
+                  {holidayMessages.hasVisitedMessage}
+                </p>
+              ) : (
+                <>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    {holidayMessages.willVisitLabel}
+                  </p>
+                  <p
+                    className="text-3xl font-bold"
+                    style={{ color: holidayColors.dark }}
+                  >
+                    {estimatedArrivalTime}
+                  </p>
+                </>
+              )}
+            </div>
+
+            {/* Interactive treat question - only show after visit if config exists */}
+            {hasVisited && holidayMessages.postVisitQuestion && (
+              <div className="mt-4">
+                {!showResponse ? (
+                  // Show question and buttons
+                  <div className="stat-card">
+                    <p className="text-sm font-medium mb-3" style={{ color: holidayColors.dark }}>
+                      {holidayMessages.postVisitQuestion.question}
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleTreatChoice('yes')}
+                        className="flex-1 py-2 px-4 rounded-xl font-semibold text-white transition-all hover:scale-105 hover:shadow-lg"
+                        style={{ backgroundColor: holidayColors.primary }}
+                      >
+                        {holidayMessages.postVisitQuestion.yesButton}
+                      </button>
+                      <button
+                        onClick={() => handleTreatChoice('no')}
+                        className="flex-1 py-2 px-4 rounded-xl font-semibold text-white transition-all hover:scale-105 hover:shadow-lg"
+                        style={{ backgroundColor: holidayColors.secondary }}
+                      >
+                        {holidayMessages.postVisitQuestion.noButton}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Show response message
+                  <div
+                    className="stat-card animate-fade-in-up"
+                    style={{ borderLeft: `4px solid ${holidayColors.accent}` }}
+                  >
+                    <div className="flex items-start gap-3">
+                      {holidayMessages.postVisitQuestion.responseEmoji && (
+                        <span className="text-3xl">{holidayMessages.postVisitQuestion.responseEmoji}</span>
+                      )}
+                      <div className="flex-1 text-left">
+                        <p className="text-sm font-medium" style={{ color: holidayColors.dark }}>
+                          {treatChoice === 'yes'
+                            ? holidayMessages.postVisitQuestion.yesResponse
+                            : holidayMessages.postVisitQuestion.noResponse}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         ) : (
           <div className="mt-4">
             <p className="text-sm text-gray-500">{holidayMessages.calculatingVisit}</p>

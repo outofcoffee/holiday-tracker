@@ -34,6 +34,7 @@ export const easterConfig: HolidayConfig = {
     nearbySubMessage: 'Keep an eye out for Easter surprises!',
     visitedLabel: 'The Easter Bunny visited at approximately:',
     willVisitLabel: 'The Easter Bunny will visit at approximately:',
+    hasVisitedMessage: 'The Easter Bunny has already visited near you!',
     calculatingVisit: 'Calculating when the Easter Bunny will visit you...',
 
     // Sleeping/off-season
@@ -63,6 +64,16 @@ export const easterConfig: HolidayConfig = {
 
     // Fun fact section
     funFactTitle: 'Easter Fun Fact',
+
+    // Post-visit interactive question
+    postVisitQuestion: {
+      question: 'Did the Easter Bunny find the carrots?',
+      yesButton: 'Yes!',
+      noButton: 'No',
+      yesResponse: 'Yum! The Easter Bunny loved munching on those crunchy carrots! Thank you!',
+      noResponse: 'Maybe next year! The Easter Bunny would love some fresh carrots for energy!',
+      responseEmoji: '🥕',
+    },
   },
 
   colors: {

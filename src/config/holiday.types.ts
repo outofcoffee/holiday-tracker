@@ -65,6 +65,7 @@ export interface HolidayMessages {
   nearbySubMessage: string;
   visitedLabel: string;
   willVisitLabel: string;
+  hasVisitedMessage: string;
   calculatingVisit: string;
 
   // Sleeping/off-season
@@ -90,6 +91,16 @@ export interface HolidayMessages {
 
   // Fun fact section
   funFactTitle: string;
+
+  // Post-visit interactive question (optional)
+  postVisitQuestion?: {
+    question: string;           // e.g., "Did Santa eat the cookies?"
+    yesButton: string;          // e.g., "Yes!"
+    noButton: string;           // e.g., "No"
+    yesResponse: string;        // Response shown when user clicks Yes
+    noResponse: string;         // Response shown when user clicks No
+    responseEmoji?: string;     // Optional emoji (🍪 or 🥕)
+  };
 }
 
 /**

@@ -35,6 +35,7 @@ export const christmasConfig: HolidayConfig = {
     nearbySubMessage: 'Keep an eye out for Christmas magic!',
     visitedLabel: 'Santa visited at approximately:',
     willVisitLabel: 'Santa will visit at approximately:',
+    hasVisitedMessage: 'Santa has already visited near you!',
     calculatingVisit: 'Calculating when Santa will visit you...',
 
     // Sleeping/off-season
@@ -64,6 +65,16 @@ export const christmasConfig: HolidayConfig = {
 
     // Fun fact section
     funFactTitle: 'Christmas Fun Fact',
+
+    // Post-visit interactive question
+    postVisitQuestion: {
+      question: 'Did Santa eat the cookies?',
+      yesButton: 'Yes!',
+      noButton: 'No',
+      yesResponse: 'Ho ho ho! Santa loved the cookies and milk! Thank you for being so thoughtful!',
+      noResponse: 'Maybe next year! Santa would love some cookies and milk to fuel his journey!',
+      responseEmoji: '🍪',
+    },
   },
 
   colors: {
