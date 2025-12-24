@@ -27,6 +27,21 @@ export interface DeliveryItemConfig {
 }
 
 /**
+ * Configuration for incoming items (items that come towards the character)
+ */
+export interface IncomingItemConfig {
+  enabled: boolean;
+  emoji: string;
+  label: string; // Label for the counter (e.g., "Mince Pies Eaten")
+  size: number;
+  backgroundColor: string;
+  borderColor: string;
+  spawnIntervalCity: number; // milliseconds between spawns at cities
+  spawnIntervalLand: number; // milliseconds between spawns over land
+  itemsPerDelivery: number; // ratio: 1 incoming item per X delivered items
+}
+
+/**
  * Messages displayed in the UI
  */
 export interface HolidayMessages {
@@ -215,6 +230,11 @@ export interface HolidayConfig {
    * Delivery item configurations
    */
   deliveryItems: DeliveryItemConfig[];
+
+  /**
+   * Incoming item configuration (optional - items that come towards the character)
+   */
+  incomingItems?: IncomingItemConfig;
 
   /**
    * Sleeping/off-season decorations

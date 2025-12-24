@@ -121,6 +121,18 @@ export const christmasConfig: HolidayConfig = {
     },
   ],
 
+  incomingItems: {
+    enabled: true,
+    emoji: '🥧',
+    label: 'Mince Pies Eaten',
+    size: 28,
+    backgroundColor: '#DEB887',
+    borderColor: '#8B4513',
+    spawnIntervalCity: 2500,
+    spawnIntervalLand: 4000,
+    itemsPerDelivery: 10,
+  },
+
   sleepingDecorations: {
     characterEmoji: '🎅',
     sleepEmoji: '❄️',

@@ -48,6 +48,7 @@ export const {
   assets: holidayAssets,
   animations: holidayAnimations,
   deliveryItems: holidayDeliveryItems,
+  incomingItems: holidayIncomingItems,
   sleepingDecorations: holidaySleepingDecorations,
   facts: holidayFacts,
   itemsDeliveredName: holidayItemsDeliveredName,

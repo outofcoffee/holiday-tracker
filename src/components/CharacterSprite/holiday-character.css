@@ -37,8 +37,17 @@
   will-change: transform, opacity;
 }
 
+.incoming-item {
+  position: absolute;
+  filter: drop-shadow(0 0 3px rgba(255, 200, 100, 0.9));
+  transform-origin: center center;
+  transition: opacity 0.1s linear;
+  will-change: transform, opacity;
+}
+
 /* Make sure emojis display correctly */
-.delivery-item div {
+.delivery-item div,
+.incoming-item div {
   line-height: 1;
   text-align: center;
 }

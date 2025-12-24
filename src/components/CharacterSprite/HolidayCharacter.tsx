@@ -6,6 +6,7 @@ import {
   getRandomFact,
   getFactForCountry,
   holidayDeliveryItems,
+  holidayIncomingItems,
   holidayAssets,
   holidayMessages,
   holidayColors,
@@ -60,6 +61,20 @@ interface DeliveryItem {
   shouldRemove: boolean;
 }
 
+// Interface for an incoming item (mince pies)
+interface IncomingItem {
+  id: string;
+  type: string;
+  angle: number;
+  distance: number;
+  size: number;
+  createdAt: number;
+  opacity: number;
+  scale: number;
+  rotation: number;
+  shouldRemove: boolean;
+}
+
 // Main component
 const HolidayCharacter: React.FC<{ position: [number, number] }> = ({ position }) => {
   const { currentPosition } = useTracker();
@@ -70,8 +85,12 @@ const HolidayCharacter: React.FC<{ position: [number, number] }> = ({ position }
   // Store delivery items with complete lifecycle management
   const [deliveryItems, setDeliveryItems] = useState<DeliveryItem[]>([]);
 
+  // Store incoming items (mince pies) with complete lifecycle management
+  const [incomingItems, setIncomingItems] = useState<IncomingItem[]>([]);
+
   // Track last spawn time to avoid too frequent spawning
   const lastSpawnTimeRef = useRef(0);
+  const lastIncomingSpawnTimeRef = useRef(0);
 
   // Get all item types from config
   const itemTypes = holidayDeliveryItems.map((item) => item.type);
@@ -233,7 +252,109 @@ const HolidayCharacter: React.FC<{ position: [number, number] }> = ({ position }
     return () => cancelAnimationFrame(animationFrame);
   }, [isDelivering, isAtCity, deliveryItems, itemTypes]);
 
-  // Create custom character icon including delivery items
+  // Animation loop for incoming items (e.g., mince pies)
+  useEffect(() => {
+    // Skip if incoming items are not enabled or not delivering
+    if (!holidayIncomingItems?.enabled || !isDelivering) return;
+
+    // Spawn new incoming items occasionally
+    const now = Date.now();
+    const timeSinceLastSpawn = now - lastIncomingSpawnTimeRef.current;
+    const spawnInterval = isAtCity
+      ? holidayIncomingItems.spawnIntervalCity
+      : holidayIncomingItems.spawnIntervalLand;
+
+    if (timeSinceLastSpawn >= spawnInterval) {
+      lastIncomingSpawnTimeRef.current = now;
+
+      // Add new incoming item(s)
+      const numItemsToSpawn = isAtCity ? Math.floor(Math.random() * 2) + 1 : 1;
+
+      const newItems: IncomingItem[] = [];
+
+      for (let i = 0; i < numItemsToSpawn; i++) {
+        // Calculate radial position
+        const angle = Math.random() * Math.PI * 2;
+
+        // Create new incoming item starting from far away
+        newItems.push({
+          id: `incoming-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          type: 'incoming',
+          angle,
+          distance: 90, // Start far away
+          size: holidayIncomingItems.size,
+          createdAt: now,
+          opacity: 0, // Start invisible
+          scale: 0.7, // Start small (like delivery items)
+          rotation: Math.random() * 10 - 5, // Small random rotation
+          shouldRemove: false,
+        });
+      }
+
+      // Add new items to state
+      setIncomingItems((prev) => [...prev, ...newItems]);
+    }
+
+    // Animation frame update all incoming items
+    const itemLifetime = 6000; // 6 seconds total lifetime (same as delivery items)
+
+    // Animation loop
+    const animationFrame = requestAnimationFrame(() => {
+      setIncomingItems((prevItems) => {
+        if (prevItems.length === 0) return prevItems;
+
+        return prevItems
+          .map((item) => {
+            const itemAge = now - item.createdAt;
+
+            // Phase 1: Appear/Pop (0-10% of lifetime) - REVERSE of delivery items
+            if (itemAge < itemLifetime * 0.1) {
+              const progress = itemAge / (itemLifetime * 0.1);
+              return {
+                ...item,
+                opacity: Math.min(0.95, progress * 0.95),
+                scale: 0.7 + progress * 0.4, // Grow to 1.1
+                distance: 90, // Stay at starting distance
+              };
+            }
+            // Phase 2: Moving Inward (10-70% of lifetime) - OPPOSITE of outward movement
+            else if (itemAge < itemLifetime * 0.7) {
+              const progress = (itemAge - itemLifetime * 0.1) / (itemLifetime * 0.6);
+              return {
+                ...item,
+                opacity: 0.95,
+                scale: 1.1 - progress * 0.15, // Shrink slightly to 0.95
+                distance: 90 - progress * 60, // Move INWARD from 90px to 30px
+              };
+            }
+            // Phase 3: Fade Out (70-100% of lifetime)
+            else if (itemAge < itemLifetime) {
+              const progress = (itemAge - itemLifetime * 0.7) / (itemLifetime * 0.3);
+              return {
+                ...item,
+                opacity: 0.95 * (1 - progress), // Fade to 0
+                scale: 0.95 - progress * 0.15, // Continue shrinking
+                distance: 30 - progress * 15, // Continue moving to center
+              };
+            }
+            // Ready for removal
+            else {
+              return {
+                ...item,
+                opacity: 0,
+                shouldRemove: true,
+              };
+            }
+          })
+          .filter((item) => !item.shouldRemove); // Remove items marked for deletion
+      });
+    });
+
+    // Cleanup animation frame
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isDelivering, isAtCity, incomingItems]);
+
+  // Create custom character icon including delivery items and incoming mince pies
   const icon = L.divIcon({
     className: 'holiday-character-container',
     iconSize: [150, 150],
@@ -272,6 +393,41 @@ const HolidayCharacter: React.FC<{ position: [number, number] }> = ({ position }
         `
           )
           .join('')}
+        ${
+          holidayIncomingItems?.enabled && holidayIncomingItems
+            ? incomingItems
+                .map(
+                  (item) => `
+          <div class="incoming-item" style="
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: ${item.size}px;
+            height: ${item.size}px;
+            background-color: ${holidayIncomingItems!.backgroundColor};
+            border-radius: 50%;
+            border: 2px solid ${holidayIncomingItems!.borderColor};
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            z-index: 98;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: ${item.opacity};
+            transform: translate(-50%, -50%)
+                       rotate(${item.rotation}deg)
+                       translate(${Math.cos(item.angle) * item.distance}px,
+                                 ${Math.sin(item.angle) * item.distance}px)
+                       scale(${item.scale});
+          ">
+            <div style="font-size: 16px; font-weight: bold;">
+              ${holidayIncomingItems!.emoji}
+            </div>
+          </div>
+        `
+                )
+                .join('')
+            : ''
+        }
         <div class="character-image">
           <img src="${holidayAssets.characterImage}" alt="${holidayAssets.characterAlt}" />
         </div>

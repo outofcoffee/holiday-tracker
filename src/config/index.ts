@@ -15,6 +15,7 @@ export {
   holidayAssets,
   holidayAnimations,
   holidayDeliveryItems,
+  holidayIncomingItems,
   holidaySleepingDecorations,
   holidayFacts,
   holidayItemsDeliveredName,

@@ -1,6 +1,6 @@
 import { useTracker } from '../../hooks/useTracker';
 import { formatNumber } from '../../utils/basketCalculator';
-import { holidayMessages, holidayColors } from '../../config';
+import { holidayMessages, holidayColors, holidayIncomingItems } from '../../config';
 
 const ProgressTracker = () => {
   const { itemsDelivered, completionPercentage, currentPosition } = useTracker();
@@ -29,17 +29,31 @@ const ProgressTracker = () => {
           </p>
         </div>
 
-        <div className="stat-card">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-            Mince Pies Eaten
-          </p>
-          <p
-            className="text-2xl font-bold"
-            style={{ color: holidayColors.highlight }}
-          >
-            {formatNumber(Math.floor(itemsDelivered / 10))}
-          </p>
-        </div>
+        {holidayIncomingItems?.enabled ? (
+          <div className="stat-card">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+              {holidayIncomingItems.label}
+            </p>
+            <p
+              className="text-2xl font-bold"
+              style={{ color: holidayColors.highlight }}
+            >
+              {formatNumber(Math.floor(itemsDelivered / holidayIncomingItems.itemsPerDelivery))}
+            </p>
+          </div>
+        ) : (
+          <div className="stat-card">
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+              {holidayMessages.journeyCompleteLabel}
+            </p>
+            <p
+              className="text-2xl font-bold"
+              style={{ color: holidayColors.highlight }}
+            >
+              {Math.round(completionPercentage)}%
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Progress Bar */}
