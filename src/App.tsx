@@ -78,15 +78,15 @@ function App() {
         {isHolidayDay ? (
           <div className="space-y-6">
             {/* Hero Map Section */}
-            <div className="relative">
-              <div className="h-[60vh] min-h-[400px] max-h-[600px] rounded-3xl overflow-hidden shadow-2xl">
+            <div className="relative h-[60vh] min-h-[400px] max-h-[600px]">
+              <div className="h-full rounded-3xl overflow-hidden shadow-2xl relative z-0">
                 <Map />
               </div>
 
               {/* Floating Status Banner */}
               {currentPosition?.currentCity && (
                 <div
-                  className={`absolute bottom-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto md:min-w-[400px] md:max-w-[600px] status-banner text-white text-center ${
+                  className={`absolute bottom-8 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto md:min-w-[400px] md:max-w-[600px] status-banner text-white text-center z-10 ${
                     currentPosition.currentCity.id === currentPosition.nextCity?.id
                       ? 'delivering'
                       : ''
