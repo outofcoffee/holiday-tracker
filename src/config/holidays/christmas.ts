@@ -139,8 +139,8 @@ export const christmasConfig: HolidayConfig = {
     size: 28,
     backgroundColor: '#DEB887',
     borderColor: '#8B4513',
-    spawnIntervalCity: 2500,
-    spawnIntervalLand: 4000,
+    spawnIntervalCity: 6000,
+    spawnIntervalLand: 6000,
     itemsPerDelivery: 10,
   },
 
