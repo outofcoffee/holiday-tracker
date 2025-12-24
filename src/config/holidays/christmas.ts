@@ -84,7 +84,6 @@ export const christmasConfig: HolidayConfig = {
     light: '#FAFBFC', // Clean off-white
     dark: '#2D1810', // Deep espresso - excellent readability
     highlight: '#5C9EAD', // Winter teal - modern accent
-    mapBorder: '#2E5744', // Dark sage green
     gradient: 'linear-gradient(135deg, #F5E6E8 0%, #E8F0E8 50%, #FDF8E8 100%)', // Warm holiday gradient
   },
 

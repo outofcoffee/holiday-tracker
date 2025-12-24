@@ -113,7 +113,6 @@ export interface HolidayColors {
   light: string;
   dark: string;
   highlight: string;
-  mapBorder: string;
   gradient: string;
 }
 

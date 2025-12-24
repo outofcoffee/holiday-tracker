@@ -83,7 +83,6 @@ export const easterConfig: HolidayConfig = {
     light: '#F8F4FF', // Very light lavender - clean background
     dark: '#4A3B5C', // Deep plum - better readability
     highlight: '#7EB89A', // Sage green - more refined
-    mapBorder: '#D4A5B5', // Dusty rose - subtle border
     gradient: 'linear-gradient(135deg, #F8E8EC 0%, #E8F4F8 50%, #F5F0E8 100%)', // Soft multi-tone gradient
   },
 

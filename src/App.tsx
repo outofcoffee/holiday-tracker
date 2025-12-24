@@ -16,7 +16,6 @@ function App() {
 
   // Set CSS custom properties for theming
   useEffect(() => {
-    document.documentElement.style.setProperty('--holiday-map-border-color', holidayColors.mapBorder);
     document.documentElement.style.setProperty('--holiday-primary', holidayColors.primary);
   }, []);
 
