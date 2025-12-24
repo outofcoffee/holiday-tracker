@@ -86,13 +86,6 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
         if (viewerLocation) {
           const isNear = position.nearestCity?.name === viewerLocation.nearestCity?.name;
           setIsNearby(isNear);
-
-          if (!estimatedArrivalTime && viewerLocation.nearestCity) {
-            // Calculate estimated arrival time based on journey
-            const { calculateArrivalTime } = await import('../utils/geoUtils');
-            const arrivalTime = await calculateArrivalTime(viewerLocation.nearestCity);
-            setEstimatedArrivalTime(arrivalTime);
-          }
         }
       }
     };
@@ -101,7 +94,28 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
     const interval = setInterval(updatePosition, 1000);
 
     return () => clearInterval(interval);
-  }, [viewerLocation, estimatedArrivalTime, isHoliday, viewerLocation?.nearestCity, mapZoomLevel]);
+  }, [viewerLocation, isHoliday, viewerLocation?.nearestCity, mapZoomLevel]);
+
+  // Update arrival time every minute when we have a viewer location
+  useEffect(() => {
+    if (!isHoliday || !viewerLocation?.nearestCity) {
+      return;
+    }
+
+    const updateArrivalTime = async () => {
+      const { calculateArrivalTime } = await import('../utils/geoUtils');
+      const arrivalTime = await calculateArrivalTime(viewerLocation.nearestCity!);
+      setEstimatedArrivalTime(arrivalTime);
+    };
+
+    // Calculate immediately
+    updateArrivalTime();
+
+    // Update every minute to keep relative time current
+    const interval = setInterval(updateArrivalTime, 60000);
+
+    return () => clearInterval(interval);
+  }, [viewerLocation?.nearestCity, isHoliday]);
 
   // Get viewer's location ONCE at startup, but only during holiday period
   useEffect(() => {
@@ -129,13 +143,6 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
               longitude,
               nearestCity,
             });
-
-            // If we have the nearest city, set an estimated arrival time
-            if (nearestCity) {
-              const { calculateArrivalTime } = await import('../utils/geoUtils');
-              const arrivalTime = await calculateArrivalTime(nearestCity);
-              setEstimatedArrivalTime(arrivalTime);
-            }
           } catch (error) {
             logger.error('Error processing location:', error);
           }
@@ -150,7 +157,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
               navigator.geolocation.getCurrentPosition(
                 async (position) => {
                   const { latitude, longitude } = position.coords;
-                  const { getUserNearestCity, calculateArrivalTime } = await import(
+                  const { getUserNearestCity } = await import(
                     '../utils/geoUtils'
                   );
                   const nearestCity = await getUserNearestCity(latitude, longitude);
@@ -160,11 +167,6 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
                     longitude,
                     nearestCity,
                   });
-
-                  if (nearestCity) {
-                    const arrivalTime = await calculateArrivalTime(nearestCity);
-                    setEstimatedArrivalTime(arrivalTime);
-                  }
                 },
                 (retryError) => {
                   logger.error('Retry failed:', retryError.message);

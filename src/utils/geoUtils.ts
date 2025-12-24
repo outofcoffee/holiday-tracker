@@ -321,19 +321,47 @@ export const getUserNearestCity = async (
   }
 };
 
+/**
+ * Format a time difference as relative time (e.g., "4 hours, 2 minutes")
+ */
+const formatRelativeTime = (milliseconds: number): string => {
+  const totalMinutes = Math.floor(milliseconds / (1000 * 60));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours > 0 && minutes > 0) {
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'}, ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+  } else if (hours > 0) {
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+  } else {
+    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+  }
+};
+
 // Calculate arrival time for a specific city
 export const calculateArrivalTime = async (city: City): Promise<string> => {
   // Import time utilities
-  const { getEasterDate, calculateIdealArrivalTime, formatTime } = await import('./timeUtils');
-  
-  // Calculate for Easter this year
+  const { getHolidayDate, calculateIdealArrivalTime, formatTime, getCurrentTime } = await import('./timeUtils');
+
+  // Calculate for the holiday this year
   const now = new Date();
-  const easterDate = getEasterDate(now.getFullYear());
-  
-  // Calculate the ideal arrival time (midnight local time on Easter)
-  const arrivalTime = calculateIdealArrivalTime(city, easterDate);
-  
-  // Format the time for display
+  const holidayDate = getHolidayDate(now.getFullYear());
+
+  // Calculate the ideal arrival time (midnight local time on holiday)
+  const arrivalTime = calculateIdealArrivalTime(city, holidayDate);
+
+  // Get current time (respects mock times for testing)
+  const currentTime = getCurrentTime();
+
+  // Calculate time difference
+  const timeDiff = arrivalTime.getTime() - currentTime.getTime();
+
+  // If arrival is in the future, show relative time
+  if (timeDiff > 0) {
+    return formatRelativeTime(timeDiff);
+  }
+
+  // If arrival has passed, show the absolute time
   return formatTime(arrivalTime);
 };
 
