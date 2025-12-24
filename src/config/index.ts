@@ -18,11 +18,13 @@ export {
   holidayIncomingItems,
   holidaySleepingDecorations,
   holidayFacts,
+  holidayJokes,
   holidayItemsDeliveredName,
   holidayPeoplePerItem,
   getRandomFact,
   getFactForCountry,
+  getRandomJoke,
 } from './holidays';
 
 // Export types
-export type { HolidayConfig, HolidayFact } from './holiday.types';
+export type { HolidayConfig, HolidayFact, HolidayJoke } from './holiday.types';

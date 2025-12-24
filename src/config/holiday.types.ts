@@ -15,6 +15,15 @@ export interface HolidayFact {
 }
 
 /**
+ * A child-friendly joke to display about the holiday
+ */
+export interface HolidayJoke {
+  id: number;
+  question: string;
+  answer: string;
+}
+
+/**
  * Configuration for delivery items that the character drops
  */
 export interface DeliveryItemConfig {
@@ -90,6 +99,9 @@ export interface HolidayMessages {
 
   // Fun fact section
   funFactTitle: string;
+
+  // Joke section
+  jokeTitle: string;
 }
 
 /**
@@ -245,6 +257,11 @@ export interface HolidayConfig {
    * Holiday facts
    */
   facts: HolidayFact[];
+
+  /**
+   * Holiday jokes (child-friendly)
+   */
+  jokes: HolidayJoke[];
 
   /**
    * Items delivered label (e.g., "Baskets" for Easter, "Presents" for Christmas)

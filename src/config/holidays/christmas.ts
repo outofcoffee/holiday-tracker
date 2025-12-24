@@ -64,6 +64,9 @@ export const christmasConfig: HolidayConfig = {
 
     // Fun fact section
     funFactTitle: 'Christmas Fun Fact',
+
+    // Joke section
+    jokeTitle: 'Christmas Joke',
   },
 
   colors: {
@@ -233,6 +236,84 @@ export const christmasConfig: HolidayConfig = {
       id: 19,
       text: 'The North Pole has a dedicated postal code in Canada: H0H 0H0!',
       country: 'Canada',
+    },
+  ],
+
+  jokes: [
+    {
+      id: 1,
+      question: 'What do you call an obnoxious reindeer?',
+      answer: 'Rude-olph!',
+    },
+    {
+      id: 2,
+      question: 'What do elves learn in school?',
+      answer: 'The elf-abet!',
+    },
+    {
+      id: 3,
+      question: 'What do you get when you cross a snowman with a vampire?',
+      answer: 'Frostbite!',
+    },
+    {
+      id: 4,
+      question: 'Why was the snowman looking through the carrots?',
+      answer: 'He was picking his nose!',
+    },
+    {
+      id: 5,
+      question: 'What do snowmen eat for breakfast?',
+      answer: 'Frosted Flakes!',
+    },
+    {
+      id: 6,
+      question: 'Why does Santa go down chimneys?',
+      answer: "Because it soots him!",
+    },
+    {
+      id: 7,
+      question: "What's the best thing to put into a Christmas cake?",
+      answer: 'Your teeth!',
+    },
+    {
+      id: 8,
+      question: 'What do you call a cat on the beach at Christmas?',
+      answer: 'Sandy Claws!',
+    },
+    {
+      id: 9,
+      question: 'Why did the Christmas tree go to the barber?',
+      answer: 'It needed to be trimmed!',
+    },
+    {
+      id: 10,
+      question: 'What falls at the North Pole but never gets hurt?',
+      answer: 'Snow!',
+    },
+    {
+      id: 11,
+      question: "What's every parent's favourite Christmas carol?",
+      answer: 'Silent Night!',
+    },
+    {
+      id: 12,
+      question: 'What do you call a broke Santa?',
+      answer: 'Saint Nickel-less!',
+    },
+    {
+      id: 13,
+      question: 'Why is Christmas just like a day at the office?',
+      answer: 'You do all the work and the fat guy in the suit gets all the credit!',
+    },
+    {
+      id: 14,
+      question: 'What nationality is Santa Claus?',
+      answer: 'North Polish!',
+    },
+    {
+      id: 15,
+      question: "What's a snowman's favourite drink?",
+      answer: 'Iced tea!',
     },
   ],
 

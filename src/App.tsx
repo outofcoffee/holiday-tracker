@@ -7,12 +7,18 @@ import LocationInfo from './components/LocationInfo/LocationInfo';
 import DebugInfo from './components/UI/DebugInfo';
 import OffSeasonCharacter from './components/UI/OffSeasonCharacter';
 import { useTracker } from './hooks/useTracker';
-import { getRandomFact, holidayMessages, holidayColors, holidaySleepingDecorations } from './config';
+import { getRandomFact, getRandomJoke, holidayMessages, holidayColors, holidaySleepingDecorations } from './config';
+import type { HolidayFact, HolidayJoke } from './config';
+
+type ContentItem =
+  | { type: 'fact'; content: HolidayFact }
+  | { type: 'joke'; content: HolidayJoke };
 
 function App() {
   const { currentPosition, isHolidayDay } = useTracker();
   const [loading, setLoading] = useState(true);
-  const [fact, setFact] = useState(getRandomFact());
+  const [currentContent, setCurrentContent] = useState<ContentItem>({ type: 'fact', content: getRandomFact() });
+  const [showAnswer, setShowAnswer] = useState(false);
 
   // Set CSS custom properties for theming
   useEffect(() => {
@@ -29,10 +35,17 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Change fact every 30 seconds
+  // Alternate between facts and jokes every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setFact(getRandomFact());
+      setCurrentContent((prev) => {
+        if (prev.type === 'fact') {
+          return { type: 'joke', content: getRandomJoke() };
+        } else {
+          return { type: 'fact', content: getRandomFact() };
+        }
+      });
+      setShowAnswer(false);
     }, 30000);
 
     return () => clearInterval(interval);
@@ -56,7 +69,11 @@ function App() {
             >
               {holidayMessages.loadingMessage}
             </h2>
-            <p className="text-gray-600 italic leading-relaxed">{fact.text}</p>
+            <p className="text-gray-600 italic leading-relaxed">
+              {currentContent.type === 'fact'
+                ? currentContent.content.text
+                : `${currentContent.content.question} ${currentContent.content.answer}`}
+            </p>
             <div className="mt-6 flex justify-center">
               <div className="spinner" style={{ color: holidayColors.primary }} />
             </div>
@@ -138,7 +155,7 @@ function App() {
               {/* Location Card */}
               <LocationInfo />
 
-              {/* Fun Fact Card */}
+              {/* Fun Fact / Joke Card */}
               <div
                 className="glass-card p-6 fact-card"
                 style={
@@ -155,10 +172,32 @@ function App() {
                   className="text-xl font-title font-semibold mb-4 flex items-center gap-2"
                   style={{ color: holidayColors.dark }}
                 >
-                  <span className="text-2xl">💡</span>
-                  {holidayMessages.funFactTitle}
+                  <span className="text-2xl">{currentContent.type === 'fact' ? '💡' : '😄'}</span>
+                  {currentContent.type === 'fact' ? holidayMessages.funFactTitle : holidayMessages.jokeTitle}
                 </h2>
-                <p className="text-gray-700 leading-relaxed italic">{fact.text}</p>
+                {currentContent.type === 'fact' ? (
+                  <p className="text-gray-700 leading-relaxed italic">{currentContent.content.text}</p>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-gray-700 leading-relaxed font-medium">{currentContent.content.question}</p>
+                    {showAnswer ? (
+                      <p className="text-gray-700 leading-relaxed italic" style={{ color: holidayColors.primary }}>
+                        {currentContent.content.answer}
+                      </p>
+                    ) : (
+                      <button
+                        onClick={() => setShowAnswer(true)}
+                        className="text-sm px-4 py-2 rounded-lg transition-colors"
+                        style={{
+                          backgroundColor: holidayColors.primary,
+                          color: 'white',
+                        }}
+                      >
+                        Reveal Answer
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -11,7 +11,7 @@
  * If not specified, defaults to 'easter'.
  */
 
-import { HolidayConfig, HolidayFact } from '../holiday.types';
+import { HolidayConfig, HolidayFact, HolidayJoke } from '../holiday.types';
 import { easterConfig } from './easter';
 import { christmasConfig } from './christmas';
 
@@ -51,6 +51,7 @@ export const {
   incomingItems: holidayIncomingItems,
   sleepingDecorations: holidaySleepingDecorations,
   facts: holidayFacts,
+  jokes: holidayJokes,
   itemsDeliveredName: holidayItemsDeliveredName,
   peoplePerItem: holidayPeoplePerItem,
 } = holidayConfig;
@@ -77,5 +78,13 @@ export const getFactForCountry = (country: string): HolidayFact | null => {
   return countryFacts[randomIndex];
 };
 
+/**
+ * Get a random joke from the holiday jokes
+ */
+export const getRandomJoke = (): HolidayJoke => {
+  const randomIndex = Math.floor(Math.random() * holidayJokes.length);
+  return holidayJokes[randomIndex];
+};
+
 // Re-export types
-export type { HolidayConfig, HolidayFact } from '../holiday.types';
+export type { HolidayConfig, HolidayFact, HolidayJoke } from '../holiday.types';

@@ -63,6 +63,9 @@ export const easterConfig: HolidayConfig = {
 
     // Fun fact section
     funFactTitle: 'Easter Fun Fact',
+
+    // Joke section
+    jokeTitle: 'Easter Joke',
   },
 
   colors: {
@@ -235,6 +238,84 @@ export const easterConfig: HolidayConfig = {
       id: 23,
       text: 'On the Greek island of Corfu, people throw clay pots from their balconies on Easter Saturday!',
       country: 'Greece',
+    },
+  ],
+
+  jokes: [
+    {
+      id: 1,
+      question: 'Why did the Easter Bunny hide?',
+      answer: "Because he was a little chicken!",
+    },
+    {
+      id: 2,
+      question: 'What do you call a rabbit with fleas?',
+      answer: 'Bugs Bunny!',
+    },
+    {
+      id: 3,
+      question: 'How does the Easter Bunny stay in shape?',
+      answer: 'Lots of eggs-ercise!',
+    },
+    {
+      id: 4,
+      question: 'What kind of music does the Easter Bunny like?',
+      answer: 'Hip hop!',
+    },
+    {
+      id: 5,
+      question: 'Why was the Easter Bunny so upset?',
+      answer: 'He was having a bad hare day!',
+    },
+    {
+      id: 6,
+      question: 'What do you call a line of rabbits walking backwards?',
+      answer: 'A receding hare-line!',
+    },
+    {
+      id: 7,
+      question: 'How do you catch a unique rabbit?',
+      answer: 'Unique up on it!',
+    },
+    {
+      id: 8,
+      question: "What's the Easter Bunny's favourite type of story?",
+      answer: 'A cotton tale!',
+    },
+    {
+      id: 9,
+      question: 'Why did the Easter egg hide?',
+      answer: 'Because it was a little chicken!',
+    },
+    {
+      id: 10,
+      question: 'What do you call a mischievous egg?',
+      answer: 'A practical yolker!',
+    },
+    {
+      id: 11,
+      question: 'What happened to the Easter Bunny at school?',
+      answer: 'He was egg-spelled!',
+    },
+    {
+      id: 12,
+      question: "What's the best way to send a letter to the Easter Bunny?",
+      answer: 'By hare mail!',
+    },
+    {
+      id: 13,
+      question: 'Why do we paint Easter eggs?',
+      answer: "Because it's easier than wallpapering them!",
+    },
+    {
+      id: 14,
+      question: "What's the Easter Bunny's favourite sport?",
+      answer: 'Basket-ball!',
+    },
+    {
+      id: 15,
+      question: 'What do you call Easter when you go pranking?',
+      answer: 'Pranks-ter!',
     },
   ],
 
