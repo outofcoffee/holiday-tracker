@@ -31,13 +31,13 @@ const ProgressTracker = () => {
 
         <div className="stat-card">
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-            {holidayMessages.journeyCompleteLabel}
+            Mince Pies Eaten
           </p>
           <p
             className="text-2xl font-bold"
             style={{ color: holidayColors.highlight }}
           >
-            {Math.round(completionPercentage)}%
+            {formatNumber(Math.floor(itemsDelivered / 10))}
           </p>
         </div>
       </div>
@@ -51,6 +51,19 @@ const ProgressTracker = () => {
             background: `linear-gradient(90deg, ${holidayColors.primary}, ${holidayColors.highlight})`,
           }}
         />
+      </div>
+
+      {/* Journey Complete Text */}
+      <div className="mt-3 text-center">
+        <p className="text-sm text-gray-500">
+          {holidayMessages.journeyCompleteLabel}:{' '}
+          <span
+            className="font-bold"
+            style={{ color: holidayColors.highlight }}
+          >
+            {Math.round(completionPercentage)}%
+          </span>
+        </p>
       </div>
 
       {/* Current Location */}
