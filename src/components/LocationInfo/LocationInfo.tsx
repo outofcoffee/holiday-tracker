@@ -1,12 +1,43 @@
 import { useEffect, useState } from 'react';
 import { useTracker } from '../../hooks/useTracker';
-import { getCurrentTime, formatTime } from '../../utils/timeUtils';
+import { getCurrentTime, getHolidayDate, calculateIdealArrivalTime } from '../../utils/timeUtils';
 import { holidayMessages, holidayColors } from '../../config';
 import logger from '../../utils/logger';
 
 const LocationInfo = () => {
   const { viewerLocation, estimatedArrivalTime, isNearby, isHolidayDay } = useTracker();
   const [permissionStatus, setPermissionStatus] = useState<string>('prompt');
+  const [hasVisited, setHasVisited] = useState<boolean>(false);
+
+  // Calculate whether the holiday character has already visited based on actual arrival time
+  useEffect(() => {
+    const calculateVisitStatus = () => {
+      if (!viewerLocation?.nearestCity || !isHolidayDay) {
+        setHasVisited(false);
+        return;
+      }
+
+      try {
+        // Calculate the actual arrival time as a Date object
+        const now = new Date();
+        const holidayDate = getHolidayDate(now.getFullYear());
+        const arrivalDate = calculateIdealArrivalTime(viewerLocation.nearestCity, holidayDate);
+
+        // Compare current time with arrival time
+        const currentTime = getCurrentTime();
+        setHasVisited(currentTime >= arrivalDate);
+      } catch (error) {
+        logger.error('Error calculating visit status:', error);
+        setHasVisited(false);
+      }
+    };
+
+    calculateVisitStatus();
+
+    // Update every minute to keep the status current
+    const interval = setInterval(calculateVisitStatus, 60000);
+    return () => clearInterval(interval);
+  }, [viewerLocation?.nearestCity, isHolidayDay]);
 
   // Check geolocation permission status - only if it's the holiday day
   useEffect(() => {
@@ -122,7 +153,7 @@ const LocationInfo = () => {
         ) : estimatedArrivalTime ? (
           <div className="mt-4 stat-card">
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-              {formatTime(getCurrentTime()) > estimatedArrivalTime
+              {hasVisited
                 ? holidayMessages.visitedLabel
                 : holidayMessages.willVisitLabel}
             </p>
