@@ -79,7 +79,7 @@ export const christmasConfig: HolidayConfig = {
 
   colors: {
     primary: '#C41E3A', // Cardinal red - rich and elegant
-    secondary: '#1B5E20', // Deep forest green - sophisticated
+    secondary: 'rgb(101 153 105)', // Deep forest green - sophisticated
     accent: '#D4AF37', // Old gold - refined metallic
     light: '#FAFBFC', // Clean off-white
     dark: '#2D1810', // Deep espresso - excellent readability
