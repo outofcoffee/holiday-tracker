@@ -1,11 +1,15 @@
 import { City, BunnyPosition, DEFAULT_MAP_ZOOM } from '../types';
 import { getCities } from '../data/cities';
 // Import the GeoJSON-based land detector for more accurate landmass detection
-import { 
-  isOverLand, 
-  getLandmassName 
+import {
+  isOverLand,
+  getLandmassName
 } from './landmassDetector';
 import logger from './logger';
+
+// Cached journey schedule for path rendering
+let cachedJourneySchedule: { city: City; arrivalTime: Date }[] | null = null;
+let cachedScheduleDate: Date | null = null;
 
 // Calculate distance between two points using Haversine formula
 export const calculateDistance = (
@@ -601,4 +605,106 @@ const findNearbyLandPosition = (
   
   // No land found within search radius
   return null;
+};
+
+/**
+ * Get the journey path showing visited cities up to the current position
+ * Returns an array of coordinates representing the path traveled so far
+ *
+ * @param currentPosition The current character position
+ * @returns Array of [latitude, longitude] tuples representing the path
+ */
+export const getJourneyPath = async (
+  currentPosition: BunnyPosition | null
+): Promise<[number, number][]> => {
+  if (!currentPosition) {
+    return [];
+  }
+
+  try {
+    // Import time utilities
+    const {
+      isEaster,
+      getEasterDate,
+      getGlobalEasterStart,
+      getGlobalEasterEnd,
+      getCurrentTime,
+      calculateIdealArrivalTime
+    } = await import('./timeUtils');
+
+    // If it's not the holiday, return empty path
+    if (!isEaster()) {
+      return [];
+    }
+
+    // Get current time and check if we need to recalculate schedule
+    const now = getCurrentTime();
+    const currentYear = now.getFullYear();
+    let easterDate = getEasterDate(currentYear);
+
+    // Check if we're in holiday period for previous or next year
+    const thisYearStart = getGlobalEasterStart(easterDate);
+    const thisYearEnd = getGlobalEasterEnd(easterDate);
+
+    if (now < thisYearStart || now > thisYearEnd) {
+      const prevYearEaster = getEasterDate(currentYear - 1);
+      const prevYearStart = getGlobalEasterStart(prevYearEaster);
+      const prevYearEnd = getGlobalEasterEnd(prevYearEaster);
+
+      if (now >= prevYearStart && now <= prevYearEnd) {
+        easterDate = prevYearEaster;
+      } else {
+        const nextYearEaster = getEasterDate(currentYear + 1);
+        const nextYearStart = getGlobalEasterStart(nextYearEaster);
+        const nextYearEnd = getGlobalEasterEnd(nextYearEaster);
+
+        if (now >= nextYearStart && now <= nextYearEnd) {
+          easterDate = nextYearEaster;
+        }
+      }
+    }
+
+    // Check if we can use cached schedule
+    const needsRecalc = !cachedJourneySchedule ||
+      !cachedScheduleDate ||
+      cachedScheduleDate.getTime() !== easterDate.getTime();
+
+    if (needsRecalc) {
+      // Get the cities sorted by timezone
+      const cities = await getCities();
+
+      // Calculate delivery schedule for each city
+      const citySchedule = cities.map(city => {
+        const arrivalTime = calculateIdealArrivalTime(city, easterDate);
+        return { city, arrivalTime };
+      });
+
+      // Sort schedule by arrival time
+      citySchedule.sort((a, b) => a.arrivalTime.getTime() - b.arrivalTime.getTime());
+
+      // Cache the schedule
+      cachedJourneySchedule = citySchedule;
+      cachedScheduleDate = easterDate;
+    }
+
+    const schedule = cachedJourneySchedule!;
+
+    // Build the path from visited cities
+    const path: [number, number][] = [];
+    const visitedCount = currentPosition.visitedCities;
+
+    // Add all visited cities to the path
+    for (let i = 0; i < visitedCount && i < schedule.length; i++) {
+      const city = schedule[i].city;
+      path.push([city.latitude, city.longitude]);
+    }
+
+    // Add the current position as the final point
+    path.push([currentPosition.latitude, currentPosition.longitude]);
+
+    return path;
+  } catch (error) {
+    logger.error('Error getting journey path:', error);
+    return [];
+  }
 };

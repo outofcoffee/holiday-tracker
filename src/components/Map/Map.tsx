@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useTracker } from '../../hooks/useTracker';
 import HolidayCharacter from '../CharacterSprite/HolidayCharacter';
+import JourneyPath from './JourneyPath';
 import { DEFAULT_MAP_ZOOM } from '../../types';
 import logger from '../../utils/logger';
 import 'leaflet/dist/leaflet.css';
@@ -137,6 +138,9 @@ const Map = () => {
           minZoom={MIN_ZOOM}
           maxZoom={MAX_ZOOM}
         />
+
+        {/* Journey path showing visited cities (rendered behind character) */}
+        <JourneyPath />
 
         {/* Holiday Character Marker with delivery items */}
         {currentPosition && (
